@@ -95,18 +95,20 @@ export default function EnhancedHome() {
 
       {/* Feature Boxes Section */}
       <main className="max-w-5xl mx-auto grid gap-10 grid-cols-1 md:grid-cols-2 px-8 py-16">
-        {/* Feature 1: Water Quality Measuring */}
-        <section className="bg-white rounded-xl border border-gray-200 shadow-lg p-8 flex flex-col items-center text-center hover:shadow-xl transition-shadow">
-          <div className="w-16 h-16 bg-cyan-100 rounded-full flex items-center justify-center mb-4">
-            <svg className="w-10 h-10 text-cyan-600" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
-            </svg>
-          </div>
-          <h2 className="text-xl font-bold mb-2">Water Quality Measuring</h2>
-          <p className="text-gray-600">
-            Advanced sensors track critical parameters (pH, oxygen, ammonia) to keep your shrimp healthy and thriving, 24/7.
-          </p>
-        </section>
+        {/* Feature 1: Water Quality Measuring - NOW CLICKABLE */}
+        <Link href="/waterqualitymonitoring" className="block">
+          <section className="bg-white rounded-xl border border-gray-200 shadow-lg p-8 flex flex-col items-center text-center hover:shadow-xl transition-all transform hover:-translate-y-1 cursor-pointer">
+            <div className="w-16 h-16 bg-cyan-100 rounded-full flex items-center justify-center mb-4">
+              <svg className="w-10 h-10 text-cyan-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold mb-2">Water Quality Measuring</h2>
+            <p className="text-gray-600">
+              Advanced sensors track critical parameters (pH, oxygen, ammonia) to keep your shrimp healthy and thriving, 24/7.
+            </p>
+          </section>
+        </Link>
 
         {/* Feature 2: Automated Feed System */}
         <Link href="/feeding" className="block">
