@@ -93,27 +93,27 @@ export default function EnhancedHome() {
         </div>
       </section>
 
-      {/* Feature Boxes Section */}
+      {/* Feature Boxes Section - ALL BALANCED */}
       <main className="max-w-5xl mx-auto grid gap-10 grid-cols-1 md:grid-cols-2 px-8 py-16">
-        {/* Feature 1: Water Quality Measuring - NOW CLICKABLE */}
-        <Link href="/waterqualitymonitoring" className="block">
-          <section className="bg-white rounded-xl border border-gray-200 shadow-lg p-8 flex flex-col items-center text-center hover:shadow-xl transition-all transform hover:-translate-y-1 cursor-pointer">
-            <div className="w-16 h-16 bg-cyan-100 rounded-full flex items-center justify-center mb-4">
+        {/* Feature 1: Water Quality Monitoring */}
+        <Link href="/waterqualitymonitoring" className="block group">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-8 flex flex-col items-center text-center hover:shadow-xl transition-all transform hover:-translate-y-1 cursor-pointer h-full">
+            <div className="w-16 h-16 bg-cyan-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
               <svg className="w-10 h-10 text-cyan-600" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold mb-2">Water Quality Measuring</h2>
+            <h2 className="text-xl font-bold mb-2">Water Quality Monitoring</h2>
             <p className="text-gray-600">
               Advanced sensors track critical parameters (pH, oxygen, ammonia) to keep your shrimp healthy and thriving, 24/7.
             </p>
-          </section>
+          </div>
         </Link>
 
         {/* Feature 2: Automated Feed System */}
-        <Link href="/feeding" className="block">
-          <section className="bg-white rounded-xl border border-gray-200 shadow-lg p-8 flex flex-col items-center text-center hover:shadow-xl transition-all transform hover:-translate-y-1 cursor-pointer">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+        <Link href="/feeding" className="block group">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-8 flex flex-col items-center text-center hover:shadow-xl transition-all transform hover:-translate-y-1 cursor-pointer h-full">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
               <svg className="w-10 h-10 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10 3.5a1.5 1.5 0 013 0V4a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-.5a1.5 1.5 0 000 3h.5a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-.5a1.5 1.5 0 00-3 0v.5a1 1 0 01-1 1H6a1 1 0 01-1-1v-3a1 1 0 00-1-1h-.5a1.5 1.5 0 010-3H4a1 1 0 001-1V6a1 1 0 011-1h3a1 1 0 001-1v-.5z" />
               </svg>
@@ -122,35 +122,39 @@ export default function EnhancedHome() {
             <p className="text-gray-600">
               AI-driven feeding schedules precisely deliver nutrition, reduce waste, and improve growth for higher efficiency.
             </p>
-          </section>
+          </div>
         </Link>
 
         {/* Feature 3: Disease Identifier */}
-        <section className="bg-white rounded-xl border border-gray-200 shadow-lg p-8 flex flex-col items-center text-center hover:shadow-xl transition-shadow">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-            <svg className="w-10 h-10 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-            </svg>
+        <Link href="/disease-detection" className="block group">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-8 flex flex-col items-center text-center hover:shadow-xl transition-all transform hover:-translate-y-1 cursor-pointer h-full">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <svg className="w-10 h-10 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold mb-2">Disease Identifier</h2>
+            <p className="text-gray-600">
+              Early AI diagnosis spots health issues before outbreaks, protecting your harvest and reducing losses.
+            </p>
           </div>
-          <h2 className="text-xl font-bold mb-2">Disease Identifier</h2>
-          <p className="text-gray-600">
-            Early AI diagnosis spots health issues before outbreaks, protecting your harvest and reducing losses.
-          </p>
-        </section>
+        </Link>
 
         {/* Feature 4: AI Agent */}
-        <section className="bg-white rounded-xl border border-gray-200 shadow-lg p-8 flex flex-col items-center text-center hover:shadow-xl transition-shadow">
-          <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
-            <svg className="w-10 h-10 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
-              <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
-            </svg>
+        <Link href="/ai-assistant" className="block group">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-8 flex flex-col items-center text-center hover:shadow-xl transition-all transform hover:-translate-y-1 cursor-pointer h-full">
+            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <svg className="w-10 h-10 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
+                <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold mb-2">AI Agent</h2>
+            <p className="text-gray-600">
+              Your digital assistant provides insights, advice, and smart analytics—right at your fingertips.
+            </p>
           </div>
-          <h2 className="text-xl font-bold mb-2">AI Agent</h2>
-          <p className="text-gray-600">
-            Your digital assistant provides insights, advice, and smart analytics—right at your fingertips.
-          </p>
-        </section>
+        </Link>
       </main>
 
       {/* Shrimp Research Section */}
