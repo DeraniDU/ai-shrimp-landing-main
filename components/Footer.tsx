@@ -25,7 +25,7 @@ export default function Footer() {
                 </svg>
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">AI Shrimp Farming</h3>
+                <h3 className="text-lg font-bold text-white">AquaNext</h3>
                 <p className="text-xs text-gray-400">Smart Aquaculture</p>
               </div>
             </div>
@@ -64,7 +64,7 @@ export default function Footer() {
         {/* Bottom Section */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-gray-400 text-sm">
-            © {year ?? '2025'} AI Shrimp Farming Project. All rights reserved.
+            © {year ?? '2025'} AquaNext Project. All rights reserved.
           </p>
 
           {/* Social Icons */}

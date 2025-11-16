@@ -7,10 +7,13 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm dark:bg-gray-900/90 border-b border-gray-200 dark:border-gray-700 shadow-sm">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-gray-50/95 backdrop-blur-sm dark:bg-gray-800/90 border-b border-gray-100 dark:border-gray-700 shadow-sm">
       <nav className="max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 flex items-center justify-between h-16">
-        <Link href="/" className="text-xl font-bold text-cyan-600 dark:text-cyan-400 hover:text-cyan-800 dark:hover:text-cyan-200">
-          AI Shrimp Farming
+        <Link 
+          href="/" 
+          className="text-xl font-bold text-cyan-700 dark:text-cyan-400 hover:text-cyan-800 dark:hover:text-cyan-300 transition-colors"
+        >
+          AquaNext
         </Link>
 
         {/* Desktop navigation */}
@@ -25,7 +28,7 @@ export default function Header() {
         <button
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle menu"
-          className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-cyan-600 hover:text-cyan-800 dark:text-cyan-400 dark:hover:text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-cyan-700 hover:text-cyan-800 dark:text-cyan-400 dark:hover:text-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-500"
         >
           <svg
             className="w-6 h-6"
@@ -55,7 +58,7 @@ export default function Header() {
 
       {/* Mobile nav menu */}
       {menuOpen && (
-        <ul className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-6 py-4 flex flex-col gap-4 shadow-md">
+        <ul className="md:hidden bg-gray-50 dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 px-6 py-4 flex flex-col gap-4 shadow-md">
           <MobileNavLink href="/" onClick={() => setMenuOpen(false)}>
             Home
           </MobileNavLink>
@@ -85,10 +88,10 @@ function NavLink({
     <li>
       <Link
         href={href}
-        className="relative text-gray-700 dark:text-gray-300 hover:text-cyan-600 dark:hover:text-cyan-400 font-medium transition-colors"
+        className="relative text-gray-600 dark:text-gray-300 hover:text-cyan-700 dark:hover:text-cyan-400 font-medium transition-colors"
       >
         {children}
-        <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-cyan-600 dark:bg-cyan-400 transition-all group-hover:w-full"></span>
+        <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-cyan-700 dark:bg-cyan-400 transition-all duration-300 hover:w-full"></span>
       </Link>
     </li>
   );
@@ -108,7 +111,7 @@ function MobileNavLink({
       <Link
         href={href}
         onClick={onClick}
-        className="block px-3 py-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-cyan-100 dark:hover:bg-cyan-900 hover:text-cyan-700 dark:hover:text-cyan-300 font-medium transition-colors"
+        className="block px-3 py-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-cyan-100 dark:hover:bg-cyan-900 hover:text-cyan-700 dark:hover:text-cyan-400 font-medium transition-colors"
       >
         {children}
       </Link>

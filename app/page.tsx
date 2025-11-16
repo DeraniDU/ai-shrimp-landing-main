@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { CldVideoPlayer } from 'next-cloudinary';
+import 'next-cloudinary/dist/cld-video-player.css';
 
 const heroImages = [
   '/hero/view-fish-farms-scotland-united-kingdom.jpg',
@@ -90,6 +92,35 @@ export default function EnhancedHome() {
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}
+        </div>
+      </section>
+
+      {/* Introduction Video Section */}
+      <section className="py-16 px-8 bg-gradient-to-b from-white to-gray-50">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 text-gray-900">
+              Watch Our Introduction
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Discover how AquaNext is revolutionizing shrimp farming in Sri Lanka with cutting-edge AI technology
+            </p>
+          </div>
+          
+          <div className="rounded-2xl overflow-hidden shadow-2xl">
+            <CldVideoPlayer
+              width="1920"
+              height="1080"
+              src="AQUANEXT_1_spcg1e"
+              colors={{
+                accent: '#0891b2',
+                base: '#000000',
+                text: '#ffffff'
+              }}
+              logo={false}
+              fontFace="Arial"
+            />
+          </div>
         </div>
       </section>
 
