@@ -112,6 +112,7 @@ export default function EnhancedHome() {
               width="1920"
               height="1080"
               src="AQUANEXT_1_spcg1e"
+              
               colors={{
                 accent: '#0891b2',
                 base: '#000000',
