@@ -62,13 +62,13 @@ export default function Header() {
           <MobileNavLink href="/" onClick={() => setMenuOpen(false)}>
             Home
           </MobileNavLink>
-          <MobileNavLink href="/about" onClick={() => setMenuOpen(false)}>
+          <MobileNavLink href="/About" onClick={() => setMenuOpen(false)}>
             About Us
           </MobileNavLink>
-          <MobileNavLink href="/contact" onClick={() => setMenuOpen(false)}>
+          <MobileNavLink href="/Contact" onClick={() => setMenuOpen(false)}>
             Contact Us
           </MobileNavLink>
-          <MobileNavLink href="/features" onClick={() => setMenuOpen(false)}>
+          <MobileNavLink href="/Insights" onClick={() => setMenuOpen(false)}>
             Features
           </MobileNavLink>
         </ul>
