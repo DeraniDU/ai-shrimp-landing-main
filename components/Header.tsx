@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
-export default function Header() {
+export default function Header() {0
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -21,7 +21,7 @@ export default function Header() {
           <NavLink href="/">Home</NavLink>
           <NavLink href="/about">About Us</NavLink>
           <NavLink href="/contact">Contact Us</NavLink>
-          <NavLink href="/features">Features</NavLink>
+          <NavLink href="/insights">Insights</NavLink>
         </ul>
 
         {/* Mobile menu button */}
@@ -69,7 +69,7 @@ export default function Header() {
             Contact Us
           </MobileNavLink>
           <MobileNavLink href="/Insights" onClick={() => setMenuOpen(false)}>
-            Features
+            Insights
           </MobileNavLink>
         </ul>
       )}
