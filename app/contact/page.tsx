@@ -1,4 +1,4 @@
-import Image from "next/image";
+import React from 'react';
 
 const team = [
   {
@@ -6,7 +6,7 @@ const team = [
     title: "Undergraduate, SLIIT (Malabe) – BSc (Hons) IT",
     email: "deranindu@gmail.com",
     phone: "+94 71 123 4567",
-    img: '/hero/deranindu.jpeg',
+    img: "/hero/deranindu.jpeg",
   },
   {
     name: "Raveen De Silva",
@@ -27,50 +27,98 @@ const team = [
     title: "Undergraduate, SLIIT (Malabe) – BSc (Hons) IT",
     email: "piyumalipalihawadana@gmail.com",
     phone: "+94 77 456 7890",
-    img: "/hero/piyumali.jpeg",
+    img: "/hero/piyumali.png",
   },
 ];
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen px-4 py-10 sm:px-8 bg-white text-gray-900">
-      <div className="max-w-3xl mx-auto text-center mb-12">
-        <h1 className="text-4xl font-extrabold mb-3">Contact Us</h1>
-        <p className="text-lg text-gray-600">
-          If you wish to collaborate, have questions, or want to learn more, feel free to contact our student team below.
-        </p>
-      </div>
-
-      {/* Our Team Section */}
-      <section>
-        <h2 className="text-2xl font-bold text-center mb-8">Our Student Team</h2>
-        <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 max-w-3xl mx-auto">
-          {team.map((member, idx) => (
-            <div
-              key={idx}
-              className="bg-white rounded-xl border border-gray-200 shadow p-6 flex flex-col items-center text-center hover:shadow-lg transition-shadow"
-            >
-              <div className="mb-4">
-                <Image
-                  src={member.img}
-                  alt={`Profile of ${member.name}`}
-                  width={96}
-                  height={96}
-                  className="rounded-full object-cover bg-gray-200"
-                />
-              </div>
-              <h3 className="text-lg font-semibold">{member.name}</h3>
-              <p className="text-gray-600 mb-3">{member.title}</p>
-              <p className="text-gray-500 text-sm mb-1">
-                Email: <span className="break-all">{member.email}</span>
-              </p>
-              <p className="text-gray-500 text-sm">
-                Phone: {member.phone}
-              </p>
-            </div>
-          ))}
+    <div className="min-h-screen px-4 py-12 sm:px-8 bg-gray-50">
+      <div className="max-w-6xl mx-auto">
+        {/* Header Section */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            Contact Us
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            If you wish to collaborate, have questions, or want to learn more, feel free to contact our student team below.
+          </p>
         </div>
-      </section>
+
+        {/* Team Section */}
+        <section>
+          <h2 className="text-2xl font-semibold text-gray-900 text-center mb-10">
+            Our Student Team
+          </h2>
+          
+          <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            {team.map((member, idx) => (
+              <div
+                key={idx}
+                className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow p-6 flex flex-col items-center"
+              >
+                {/* Profile Image */}
+                <div className="mb-4">
+                  <img
+                    src={member.img}
+                    alt={`Profile of ${member.name}`}
+                    className="w-24 h-24 rounded-full object-cover border-2 border-gray-200"
+                  />
+                </div>
+
+                {/* Member Info */}
+                <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">
+                  {member.name}
+                </h3>
+                <p className="text-sm text-gray-600 text-center mb-6 leading-relaxed">
+                  {member.title}
+                </p>
+
+                {/* Contact Information */}
+                <div className="w-full flex flex-col gap-3 mt-auto">
+                  {/* Email Box */}
+                  <a
+                    href={`mailto:${member.email}`}
+                    className="flex items-center gap-2 w-full border border-cyan-600 text-cyan-600 rounded-lg px-3 py-2.5 text-sm hover:bg-cyan-600 hover:text-white transition-colors"
+                  >
+                    <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                    </svg>
+                    <span className="truncate">{member.email}</span>
+                  </a>
+
+                  {/* Phone Box */}
+                  <a
+                    href={`tel:${member.phone.replace(/\s/g, "")}`}
+                    className="flex items-center gap-2 w-full border border-cyan-600 text-cyan-600 rounded-lg px-3 py-2.5 text-sm hover:bg-cyan-600 hover:text-white transition-colors"
+                  >
+                    <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                    </svg>
+                    <span>{member.phone}</span>
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Footer Info */}
+        <div className="mt-16 text-center">
+          <div className="bg-white rounded-lg border border-gray-200 p-8 max-w-3xl mx-auto">
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">
+              Get In Touch
+            </h3>
+            <p className="text-gray-600 mb-4">
+              We are available to discuss collaboration opportunities and answer any questions about our automated shrimp pond monitoring system.
+            </p>
+            <p className="text-sm text-gray-500">
+              SLIIT, Malabe Campus • Sri Lanka
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
