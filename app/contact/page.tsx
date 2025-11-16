@@ -4,30 +4,30 @@ const team = [
   {
     name: "Deranindu Gunasekara",
     title: "Undergraduate, SLIIT (Malabe) – BSc (Hons) IT",
-    email: "nimal.perera@sliit.lk",
+    email: "deranindu@gmail.com",
     phone: "+94 71 123 4567",
-    img: "/team1.jpg",
+    img: '/hero/deranindu.jpeg',
   },
   {
     name: "Raveen De Silva",
     title: "Undergraduate, SLIIT (Malabe) – BSc (Hons) IT",
-    email: "samanthi.silva@sliit.lk",
+    email: "rdesilva614@gmail.com",
     phone: "+94 71 234 5678",
-    img: "/team2.jpg",
+    img: "/hero/raveen.jpg",
   },
   {
     name: "Samadi Senavirathne",
     title: "Undergraduate, SLIIT (Malabe) – BSc (Hons) IT",
-    email: "kavindu.fernando@sliit.lk",
+    email: "jithmisamadi2001@gmail.com",
     phone: "+94 77 345 6789",
-    img: "/team3.jpg",
+    img: "/hero/samadi.jpeg",
   },
   {
     name: "Piyumali Palihawadana",
     title: "Undergraduate, SLIIT (Malabe) – BSc (Hons) IT",
-    email: "shehani.gunawardena@sliit.lk",
+    email: "piyumalipalihawadana@gmail.com",
     phone: "+94 77 456 7890",
-    img: "/team4.jpg",
+    img: "/hero/piyumali.jpeg",
   },
 ];
 

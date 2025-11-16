@@ -19,7 +19,7 @@ export default function EnhancedHome() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroImages.length);
-    }, 2500);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, []);
