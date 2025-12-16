@@ -279,7 +279,7 @@ export default function FeedingSection() {
               <div>
                 <h3 className="text-2xl font-bold mb-3 text-gray-900">Simple Input</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Just enter two things: shrimp age (in months) and initial PL count.
+                  Just enter two things: shrimp age (in days) and initial PL count.
                   That's all the information our system needs to get started.
                 </p>
               </div>
