@@ -14,7 +14,7 @@ export default function FeedingSection() {
           Our intelligent feed management system revolutionizes shrimp aquaculture by using AI and IoT technologies to automatically deliver the optimal amount of feed. This ensures healthy shrimp growth, reduces costs, and minimizes waste—bringing high efficiency and sustainability to shrimp farms.
         </p>
 
-        {/* Overview Banner */}
+        
         <div className="relative w-full h-64 md:h-[450px] mb-12">
           <Image
             src="/feeding-banner.png"
