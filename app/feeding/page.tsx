@@ -407,7 +407,7 @@ export default function FeedingSection() {
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div className="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition-colors">
                     <div className="text-cyan-400 text-sm mb-1">Shrimp Age</div>
-                    <div className="text-white text-2xl font-bold">3 months</div>
+                    <div className="text-white text-2xl font-bold">30 Days</div>
                   </div>
                   <div className="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition-colors">
                     <div className="text-blue-400 text-sm mb-1">PL Count</div>
