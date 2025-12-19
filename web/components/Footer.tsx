@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { FaFacebookF, FaTwitter, FaLinkedinIn, FaInstagram } from 'react-icons/fa';
+import { FaFacebookF, FaTwitter, FaLinkedinIn } from 'react-icons/fa';
 import Link from 'next/link';
 
 export default function Footer() {
@@ -16,21 +16,19 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 sm:px-12 lg:px-20">
         {/* Top Section */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+          
           {/* About Column */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
-                </svg>
-              </div>
+              {/* Removed the icon block */}
               <div>
                 <h3 className="text-lg font-bold text-white">AquaNext</h3>
                 <p className="text-xs text-gray-400">Smart Aquaculture</p>
               </div>
             </div>
+
             <p className="text-sm text-gray-400 leading-relaxed">
-              Revolutionizing shrimp farming in Sri Lanka through AI-powered monitoring, 
+              Revolutionizing shrimp farming in Sri Lanka through AI-powered monitoring,
               automated feeding systems, and intelligent disease detection for sustainable aquaculture.
             </p>
           </div>
@@ -89,13 +87,7 @@ export default function Footer() {
   );
 }
 
-function FooterLink({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
+function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <li>
       <Link
