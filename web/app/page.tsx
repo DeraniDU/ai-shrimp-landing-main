@@ -7,42 +7,81 @@ import { CldVideoPlayer } from 'next-cloudinary';
 import 'next-cloudinary/dist/cld-video-player.css';
 
 const stats = [
-  { value: '30%', label: 'Yield Increase', icon: '📈' },
-  { value: '50%', label: 'Feed Cost Reduction', icon: '💰' },
-  { value: '24/7', label: 'Monitoring', icon: '🔍' },
-  { value: '95%', label: 'Disease Prevention', icon: '🛡️' },
+  { 
+    value: '30%', 
+    label: 'Yield Increase', 
+    icon: (
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+    )
+  },
+  { 
+    value: '50%', 
+    label: 'Feed Cost Reduction', 
+    icon: (
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    )
+  },
+  { 
+    value: '24/7', 
+    label: 'Monitoring', 
+    icon: (
+      <>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+      </>
+    )
+  },
+  { 
+    value: '95%', 
+    label: 'Disease Prevention', 
+    icon: (
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+    )
+  },
 ];
 
 const benefits = [
   {
     title: 'Real-Time Monitoring',
     description: 'Get instant alerts on water quality parameters, ensuring optimal conditions 24/7.',
-    icon: '📊'
+    icon: (
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+    )
   },
   {
     title: 'Cost Efficiency',
     description: 'Reduce feed waste and operational costs with AI-powered optimization.',
-    icon: '💵'
+    icon: (
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    )
   },
   {
     title: 'Disease Prevention',
     description: 'Early detection and prevention of diseases before they impact your harvest.',
-    icon: '🔬'
+    icon: (
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+    )
   },
   {
     title: 'Sustainable Farming',
     description: 'Eco-friendly practices that reduce environmental impact while maximizing yield.',
-    icon: '🌱'
+    icon: (
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    )
   },
   {
     title: 'Data-Driven Insights',
     description: 'Comprehensive analytics and reports to make informed farming decisions.',
-    icon: '📈'
+    icon: (
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+    )
   },
   {
     title: 'Expert Support',
     description: 'Access to aquaculture experts and continuous system improvements.',
-    icon: '👥'
+    icon: (
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+    )
   }
 ];
 
@@ -51,25 +90,36 @@ const processSteps = [
     step: '01',
     title: 'Installation',
     description: 'Quick setup of sensors and monitoring equipment at your farm',
-    icon: '⚙️'
+    icon: (
+      <>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      </>
+    )
   },
   {
     step: '02',
     title: 'Data Collection',
     description: 'Continuous monitoring of water quality, feeding patterns, and shrimp health',
-    icon: '📡'
+    icon: (
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+    )
   },
   {
     step: '03',
     title: 'AI Analysis',
     description: 'Advanced algorithms analyze data and provide actionable insights',
-    icon: '🤖'
+    icon: (
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    )
   },
   {
     step: '04',
     title: 'Optimization',
     description: 'Automated adjustments and recommendations for maximum efficiency',
-    icon: '✨'
+    icon: (
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+    )
   }
 ];
 
@@ -284,7 +334,7 @@ export default function EnhancedHome() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10 sm:mb-12">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mb-3">
-              Proven Results
+              Results We trying to achieve
             </h2>
             <p className="text-cyan-50 text-sm sm:text-lg max-w-2xl mx-auto">
               See how AquaNext is transforming shrimp farming operations across Sri Lanka
@@ -296,7 +346,11 @@ export default function EnhancedHome() {
                 key={idx}
                 className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center border border-white/20 hover:bg-white/20 transition-all transform hover:scale-105"
               >
-                <div className="text-4xl mb-3">{stat.icon}</div>
+                <div className="flex justify-center mb-3">
+                  <svg className="w-10 h-10 sm:w-12 sm:h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {stat.icon}
+                  </svg>
+                </div>
                 <div className="text-3xl sm:text-4xl font-extrabold text-white mb-2">{stat.value}</div>
                 <div className="text-cyan-100 text-sm sm:text-base font-medium">{stat.label}</div>
               </div>
@@ -322,7 +376,11 @@ export default function EnhancedHome() {
                 key={idx}
                 className="bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 p-6 sm:p-8 hover:shadow-xl transition-all transform hover:-translate-y-1"
               >
-                <div className="text-5xl mb-4">{benefit.icon}</div>
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-cyan-100 rounded-lg flex items-center justify-center mb-4">
+                  <svg className="w-6 h-6 sm:w-7 sm:h-7 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {benefit.icon}
+                  </svg>
+                </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{benefit.title}</h3>
                 <p className="text-gray-600 text-sm sm:text-base leading-relaxed">{benefit.description}</p>
               </div>
@@ -349,7 +407,13 @@ export default function EnhancedHome() {
                 className="relative text-center"
               >
                 <div className="bg-white rounded-xl border-2 border-cyan-200 p-6 sm:p-8 hover:border-cyan-400 hover:shadow-lg transition-all">
-                  <div className="text-5xl mb-4">{step.icon}</div>
+                  <div className="flex justify-center mb-4">
+                    <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center">
+                      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        {step.icon}
+                      </svg>
+                    </div>
+                  </div>
                   <div className="absolute top-4 right-4 text-cyan-600 font-extrabold text-2xl opacity-20">
                     {step.step}
                   </div>
