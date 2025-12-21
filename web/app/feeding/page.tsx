@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { LineChart, Line, BarChart, Bar, AreaChart, Area, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 
@@ -11,9 +12,9 @@ export default function FeedingSection() {
   const [activeChartTab, setActiveChartTab] = useState('growth');
 
   const heroImages = [
-    '/hero/5.webp',
+    '/hero/4.jpg',
+    '/hero/5.jpg',
     '/hero/6.jpg',
-    '/hero/2.jpg',
   ];
 
   useEffect(() => {
@@ -178,12 +179,16 @@ export default function FeedingSection() {
               AI-powered acoustic technology that listens to your shrimp and feeds them exactly when they're hungry
             </p>
             <div className="flex gap-4 justify-center flex-wrap">
+               <Link href="/demo">
               <button className="px-8 py-3 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold rounded-lg shadow-lg transition-all transform hover:scale-105">
                 Watch Demo
               </button>
+              </Link>
+              <Link href="/LearnMorePage">
               <button className="px-8 py-3 bg-white hover:bg-gray-100 text-cyan-600 font-semibold rounded-lg shadow-lg transition-all transform hover:scale-105">
                 Learn More
               </button>
+              </Link>
             </div>
           </div>
         </div>
