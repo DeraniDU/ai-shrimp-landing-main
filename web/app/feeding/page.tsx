@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { LineChart, Line, BarChart, Bar, AreaChart, Area, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 
@@ -11,9 +12,9 @@ export default function FeedingSection() {
   const [activeChartTab, setActiveChartTab] = useState('growth');
 
   const heroImages = [
-    '/hero/5.webp',
+    '/hero/4.jpg',
+    '/hero/5.jpg',
     '/hero/6.jpg',
-    '/hero/2.jpg',
   ];
 
   useEffect(() => {
@@ -95,12 +96,18 @@ export default function FeedingSection() {
   ];
 
   const feedingSchedule = [
-    { time: '05:00', amount: 5.1, appetite: 'HIGH', temp: 28 }, { time: '07:00', amount: 5.3, appetite: 'HIGH', temp: 29 },
-    { time: '09:00', amount: 5.0, appetite: 'MEDIUM', temp: 30 }, { time: '11:00', amount: 4.8, appetite: 'MEDIUM', temp: 31 },
-    { time: '13:00', amount: 5.2, appetite: 'HIGH', temp: 32 }, { time: '15:00', amount: 5.4, appetite: 'HIGH', temp: 31 },
-    { time: '17:00', amount: 5.1, appetite: 'MEDIUM', temp: 30 }, { time: '19:00', amount: 5.5, appetite: 'HIGH', temp: 29 },
-    { time: '21:00', amount: 5.0, appetite: 'MEDIUM', temp: 28 }, { time: '23:00', amount: 4.7, appetite: 'LOW', temp: 27 },
-    { time: '01:00', amount: 4.5, appetite: 'LOW', temp: 26 }, { time: '03:00', amount: 4.6, appetite: 'MEDIUM', temp: 27 }
+    { time: '05:00', amount: 5.1, appetite: 'HIGH', temp: 28 },
+    { time: '07:00', amount: 5.3, appetite: 'HIGH', temp: 29 },
+    { time: '09:00', amount: 5.0, appetite: 'HIGH', temp: 30 },
+    { time: '11:00', amount: 4.8, appetite: 'LOW', temp: 31 },
+    { time: '13:00', amount: 5.2, appetite: 'HIGH', temp: 32 },
+    { time: '15:00', amount: 5.4, appetite: 'HIGH', temp: 31 },
+    { time: '17:00', amount: 5.1, appetite: 'LOW', temp: 30 },
+    { time: '19:00', amount: 5.5, appetite: 'HIGH', temp: 29 },
+    { time: '21:00', amount: 5.0, appetite: 'LOW', temp: 28 },
+    { time: '23:00', amount: 0, appetite: 'NO FEEDING', temp: 27 },
+    { time: '01:00', amount: 0, appetite: 'NO FEEDING', temp: 26 },
+    { time: '03:00', amount: 0, appetite: 'NO FEEDING', temp: 27 }
   ];
 
   const growthData = [
@@ -172,12 +179,16 @@ export default function FeedingSection() {
               AI-powered acoustic technology that listens to your shrimp and feeds them exactly when they're hungry
             </p>
             <div className="flex gap-4 justify-center flex-wrap">
+               <Link href="/demo">
               <button className="px-8 py-3 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold rounded-lg shadow-lg transition-all transform hover:scale-105">
                 Watch Demo
               </button>
+              </Link>
+              <Link href="/LearnMorePage">
               <button className="px-8 py-3 bg-white hover:bg-gray-100 text-cyan-600 font-semibold rounded-lg shadow-lg transition-all transform hover:scale-105">
                 Learn More
               </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -760,27 +771,27 @@ export default function FeedingSection() {
                 <div
                   key={i}
                   className={`text-center p-4 rounded-xl border 
-              ${schedule.appetite === 'HIGH'
+          ${schedule.appetite === 'HIGH'
                       ? 'bg-green-50 border-green-200'
-                      : schedule.appetite === 'MEDIUM'
+                      : schedule.appetite === 'LOW'
                         ? 'bg-yellow-50 border-yellow-200'
                         : 'bg-red-50 border-red-200'}`}
                 >
                   <div className="text-xs text-gray-500 mb-1">{schedule.time}</div>
 
                   <div className="text-2xl font-bold text-gray-800 mb-1">
-                    {schedule.amount} kg
+                    {schedule.amount > 0 ? `${schedule.amount} kg` : 'No Feed'}
                   </div>
 
                   <div
                     className={`inline-block text-xs font-bold px-3 py-1 rounded-full mb-2
-                ${schedule.appetite === 'HIGH'
+            ${schedule.appetite === 'HIGH'
                         ? 'bg-green-100 text-green-700'
-                        : schedule.appetite === 'MEDIUM'
+                        : schedule.appetite === 'LOW'
                           ? 'bg-yellow-100 text-yellow-700'
                           : 'bg-red-100 text-red-700'}`}
                   >
-                    {schedule.appetite} APPETITE
+                    {schedule.appetite}
                   </div>
 
                   <div className="text-xs text-gray-500">
@@ -798,16 +809,15 @@ export default function FeedingSection() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 bg-yellow-400 rounded-full"></span>
-                Medium Appetite
+                Low Appetite
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 bg-red-400 rounded-full"></span>
-                Low Appetite
+                No Feeding
               </div>
             </div>
           </div>
-
-        </div>
+          </div>
       </section>
 
       {/* Shrimp Response */}
