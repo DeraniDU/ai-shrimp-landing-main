@@ -290,8 +290,8 @@ export default function FeedingSection() {
               <div>
                 <h3 className="text-2xl font-bold mb-3 text-gray-900">Simple Input</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Just enter two things: shrimp age (in days) and initial PL count.
-                  That's all the information our system needs to get started.
+                  Create your batch by entering basic information: 
+                  shrimp species, PL count, age, pond size, and survival rate.
                 </p>
               </div>
             </div>
@@ -305,8 +305,8 @@ export default function FeedingSection() {
               <div>
                 <h3 className="text-2xl font-bold mb-3 text-gray-900">Auto-Calculation</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Our system automatically calculates survival rates, biomass, average weight,
-                  and optimal daily feed requirements based on NAQDA guidelines.
+                  The system calculates daily feed requirements, biomass, and feeding schedules based on 
+                  your shrimp's age and growth stage on NAQDA guidelines.
                 </p>
               </div>
             </div>
@@ -354,7 +354,7 @@ export default function FeedingSection() {
               </h2>
               <p className="text-lg text-gray-600 mb-8 leading-relaxed">
                 Our system uses a Convolutional Neural Network (CNN) trained on 1,200+ audio samples
-                to detect shrimp feeding patterns with 85% accuracy.
+                to detect shrimp feeding patterns with 96% accuracy.
               </p>
 
               <div className="space-y-6">
