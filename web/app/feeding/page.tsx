@@ -382,8 +382,8 @@ export default function FeedingSection() {
                   <div>
                     <h3 className="text-xl font-bold mb-2 text-gray-900">Real-Time Adjustment</h3>
                     <p className="text-gray-600">
-                      System analyzes audio every 5 seconds and adjusts feeding speed
-                      instantly based on shrimp appetite levels.
+                      The AI processes audio in 15-second chunks and classifies feeding activity into three states: 
+                      hungry (HIGH), satisfied (LOW), or full (NO).
                     </p>
                   </div>
                 </div>
@@ -395,10 +395,10 @@ export default function FeedingSection() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold mb-2 text-gray-900">Machine Learning</h3>
+                    <h3 className="text-xl font-bold mb-2 text-gray-900">Deep Learning Model</h3>
                     <p className="text-gray-600">
-                      Mel-spectrogram analysis with 128×469 features processed through
-                      deep learning model for accurate classification.
+                      Our CNN model uses mel-spectrogram analysis (128×469 features) to accurately 
+                      classify feeding sounds and make intelligent feeding decisions.
                     </p>
                   </div>
                 </div>
