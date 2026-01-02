@@ -543,7 +543,10 @@ export default function WaterQualityMonitoring() {
           </div>
 
           <div className="mt-12 bg-white rounded-2xl p-8 shadow-lg">
-            <h3 className="text-2xl font-bold mb-6">Sensor Specifications</h3>
+           <h3 className="text-2xl font-bold mb-6 text-blue-600">
+  Sensor Specifications
+</h3>
+
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <h4 className="font-bold text-cyan-700 mb-3">Accuracy</h4>
@@ -781,46 +784,54 @@ export default function WaterQualityMonitoring() {
           </div>
 
           <div className="mt-12 bg-white rounded-2xl p-8 shadow-lg">
-            <h3 className="text-2xl font-bold mb-6">Model Performance Summary</h3>
+            <h3 className="text-2xl font-bold mb-6 text-gray-900">Model Performance Summary</h3>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full">
                 <thead>
-                  <tr className="bg-gray-100">
-                    <th className="p-3 text-left">Model</th>
-                    <th className="p-3 text-center">MAE</th>
-                    <th className="p-3 text-center">RMSE</th>
-                    <th className="p-3 text-center">R²</th>
-                    <th className="p-3 text-center">Best Use Case</th>
+                  <tr className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white">
+                    <th className="p-4 text-left font-bold text-base">Model</th>
+                    <th className="p-4 text-center font-bold text-base">MAE</th>
+                    <th className="p-4 text-center font-bold text-base">RMSE</th>
+                    <th className="p-4 text-center font-bold text-base">R²</th>
+                    <th className="p-4 text-center font-bold text-base">Best Use Case</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b">
-                    <td className="p-3 font-semibold">ANN (Temperature)</td>
-                    <td className="p-3 text-center">0.4023</td>
-                    <td className="p-3 text-center">0.5336</td>
-                    <td className="p-3 text-center text-green-600 font-bold">0.7178</td>
-                    <td className="p-3 text-center">Overall best accuracy</td>
+                  <tr className="border-b-2 border-gray-200 hover:bg-purple-50 transition-colors">
+                    <td className="p-4 font-bold text-gray-900 text-base">ANN (Temperature)</td>
+                    <td className="p-4 text-center text-gray-800 font-semibold text-base">0.4023</td>
+                    <td className="p-4 text-center text-gray-800 font-semibold text-base">0.5336</td>
+                    <td className="p-4 text-center">
+                      <span className="px-3 py-1 bg-green-100 text-green-800 font-bold rounded-full text-base">0.7178</span>
+                    </td>
+                    <td className="p-4 text-center text-gray-800 font-medium text-base">Overall best accuracy</td>
                   </tr>
-                  <tr className="border-b">
-                    <td className="p-3 font-semibold">SVM (Temperature)</td>
-                    <td className="p-3 text-center text-green-600 font-bold">0.3645</td>
-                    <td className="p-3 text-center text-green-600 font-bold">0.4823</td>
-                    <td className="p-3 text-center">0.7479</td>
-                    <td className="p-3 text-center">Lowest error rates</td>
+                  <tr className="border-b-2 border-gray-200 hover:bg-blue-50 transition-colors">
+                    <td className="p-4 font-bold text-gray-900 text-base">SVM (Temperature)</td>
+                    <td className="p-4 text-center">
+                      <span className="px-3 py-1 bg-green-100 text-green-800 font-bold rounded-full text-base">0.3645</span>
+                    </td>
+                    <td className="p-4 text-center">
+                      <span className="px-3 py-1 bg-green-100 text-green-800 font-bold rounded-full text-base">0.4823</span>
+                    </td>
+                    <td className="p-4 text-center text-gray-800 font-semibold text-base">0.7479</td>
+                    <td className="p-4 text-center text-gray-800 font-medium text-base">Lowest error rates</td>
                   </tr>
-                  <tr>
-                    <td className="p-3 font-semibold">MLR (Temperature)</td>
-                    <td className="p-3 text-center">0.4953</td>
-                    <td className="p-3 text-center">0.6370</td>
-                    <td className="p-3 text-center">0.5602</td>
-                    <td className="p-3 text-center">Fast & interpretable</td>
+                  <tr className="hover:bg-cyan-50 transition-colors">
+                    <td className="p-4 font-bold text-gray-900 text-base">MLR (Temperature)</td>
+                    <td className="p-4 text-center text-gray-800 font-semibold text-base">0.4953</td>
+                    <td className="p-4 text-center text-gray-800 font-semibold text-base">0.6370</td>
+                    <td className="p-4 text-center text-gray-800 font-semibold text-base">0.5602</td>
+                    <td className="p-4 text-center text-gray-800 font-medium text-base">Fast & interpretable</td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <p className="text-sm text-gray-600 mt-4">
-              * Lower MAE and RMSE values indicate better accuracy. Higher R² values (closer to 1.0) indicate better model fit.
-            </p>
+            <div className="mt-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
+              <p className="text-base text-gray-800 font-medium">
+                <strong className="text-blue-800">Note:</strong> Lower MAE and RMSE values indicate better accuracy. Higher R² values (closer to 1.0) indicate better model fit.
+              </p>
+            </div>
           </div>
         </div>
       </section>
