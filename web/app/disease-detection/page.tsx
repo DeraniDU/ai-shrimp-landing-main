@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { 
   AlertCircle, Shield, TrendingUp, Clock, Eye, Zap, 
   Camera, Brain, CheckCircle, Bell, Activity, Database,
@@ -70,24 +71,38 @@ export default function DiseaseDetection() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Hero Section */}
-      <section className="pt-20 pb-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto">
+      <section className="relative pt-20 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/hero/view-fish-farms-scotland-united-kingdom.jpg"
+            alt="Modern aquaculture farm with sustainable shrimp farming"
+            fill
+            className="object-cover"
+            priority
+          />
+          {/* Overlay for better text readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-900/80 via-blue-900/70 to-slate-900/80"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-slate-900/30"></div>
+        </div>
+
+        <div className="relative z-10 max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <div className="inline-block bg-cyan-50 px-4 py-2 rounded-full mb-4">
-              <span className="text-cyan-700 font-semibold text-sm">🦐 Smart Aquaculture</span>
+            <div className="inline-block bg-white/20 backdrop-blur-sm border border-white/30 px-4 py-2 rounded-full mb-4">
+              <span className="text-white font-semibold text-sm">🦐 Smart Aquaculture</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 drop-shadow-lg">
               Shrimp Disease Detection System
             </h1>
-            <p className="text-xl text-gray-600 mb-4">
+            <p className="text-xl text-cyan-100 mb-4 drop-shadow-md">
               Smart, Early Detection for Sustainable Aquaculture
             </p>
-            <p className="text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg text-gray-100 max-w-3xl mx-auto leading-relaxed drop-shadow-md">
               Shrimp farming is one of the fastest-growing aquaculture industries in the world. However, 
               disease outbreaks—especially White Spot Syndrome Virus (WSSV)—continue to cause massive losses 
               to shrimp farmers every year.
             </p>
-            <p className="text-lg text-cyan-700 font-semibold max-w-3xl mx-auto leading-relaxed mt-4">
+            <p className="text-lg text-cyan-200 font-semibold max-w-3xl mx-auto leading-relaxed mt-4 drop-shadow-md">
               Our AI-powered Shrimp Disease Detection System provides early, real-time disease identification, 
               helping farmers take action before outbreaks spread and destroy entire ponds.
             </p>
@@ -97,13 +112,13 @@ export default function DiseaseDetection() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
             <Link
               href="/demo"
-              className="px-8 py-4 bg-cyan-600 text-white rounded-lg font-semibold hover:bg-cyan-700 transition-colors text-center"
+              className="px-8 py-4 bg-cyan-500 text-white rounded-lg font-semibold hover:bg-cyan-400 transition-colors text-center shadow-lg backdrop-blur-sm"
             >
               Request a Demo
             </Link>
             <Link
               href="/contact"
-              className="px-8 py-4 bg-white text-cyan-600 border-2 border-cyan-600 rounded-lg font-semibold hover:bg-cyan-50 transition-colors text-center"
+              className="px-8 py-4 bg-white/20 backdrop-blur-sm text-white border-2 border-white/50 rounded-lg font-semibold hover:bg-white/30 transition-colors text-center shadow-lg"
             >
               Contact Us
             </Link>
@@ -457,12 +472,13 @@ export default function DiseaseDetection() {
           <div className="grid sm:grid-cols-3 gap-8">
             {/* Farm Image 1 */}
             <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-              <div className="bg-gradient-to-br from-cyan-200 to-blue-300 h-48 flex items-center justify-center">
-                <div className="text-center">
-                  <Camera className="w-16 h-16 text-white opacity-50 mx-auto mb-2" />
-                  <p className="text-white font-semibold">Farm Monitoring Setup</p>
-                  <p className="text-white text-sm">(Add your farm image)</p>
-                </div>
+              <div className="relative h-48">
+                <Image
+                  src="/farm-images/farm-monitoring.jpeg"
+                  alt="Farm monitoring setup with underwater cameras"
+                  fill
+                  className="object-cover"
+                />
               </div>
               <div className="p-6">
                 <h3 className="font-semibold text-gray-900 mb-2">Real-Time Tank Monitoring</h3>
@@ -474,12 +490,13 @@ export default function DiseaseDetection() {
 
             {/* Farm Image 2 */}
             <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-              <div className="bg-gradient-to-br from-purple-200 to-pink-300 h-48 flex items-center justify-center">
-                <div className="text-center">
-                  <Brain className="w-16 h-16 text-white opacity-50 mx-auto mb-2" />
-                  <p className="text-white font-semibold">AI Analysis Dashboard</p>
-                  <p className="text-white text-sm">(Add your dashboard image)</p>
-                </div>
+              <div className="relative h-48">
+                <Image
+                  src="/ai-assistant/ai-assistant-banner.png"
+                  alt="AI assistant dashboard for farm management"
+                  fill
+                  className="object-cover"
+                />
               </div>
               <div className="p-6">
                 <h3 className="font-semibold text-gray-900 mb-2">Live Disease Detection</h3>
@@ -491,12 +508,13 @@ export default function DiseaseDetection() {
 
             {/* Farm Image 3 */}
             <div className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-              <div className="bg-gradient-to-br from-green-200 to-emerald-300 h-48 flex items-center justify-center">
-                <div className="text-center">
-                  <CheckCircle className="w-16 h-16 text-white opacity-50 mx-auto mb-2" />
-                  <p className="text-white font-semibold">Healthy Tank Results</p>
-                  <p className="text-white text-sm">(Add your success image)</p>
-                </div>
+              <div className="relative h-48">
+                <Image
+                  src="/hero/view-fish-farms-scotland-united-kingdom.jpg"
+                  alt="Modern shrimp farm with healthy aquaculture setup"
+                  fill
+                  className="object-cover"
+                />
               </div>
               <div className="p-6">
                 <h3 className="font-semibold text-gray-900 mb-2">Healthy Harvest Achieved</h3>
@@ -505,18 +523,6 @@ export default function DiseaseDetection() {
                 </p>
               </div>
             </div>
-          </div>
-
-          <div className="mt-12 bg-blue-50 border-2 border-blue-300 rounded-lg p-8">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">📸 Add Your Farm Images</h3>
-            <p className="text-gray-700 mb-4">
-              To replace these placeholders with real farm images, replace the gradient backgrounds with your actual photos:
-            </p>
-            <ul className="space-y-2 text-gray-700 text-sm font-mono bg-white p-4 rounded border border-gray-300">
-              <li>1. Replace the gradient divs with: <code>&lt;Image src="/your-farm-image.jpg" alt="..." /&gt;</code></li>
-              <li>2. Place farm images in: <code>public/farm-images/</code></li>
-              <li>3. Import Image from 'next/image' at the top of the file</li>
-            </ul>
           </div>
         </div>
       </section>
