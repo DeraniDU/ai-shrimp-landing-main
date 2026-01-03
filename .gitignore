@@ -45,3 +45,38 @@ coverage/
 
 # Misc
 .dump.rdb
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+*.egg-info/
+dist/
+*.egg
+
+# Python - AutoGluon / ML Models
+*.pkl
+**/autogluon_models/
+**/xgboost_models/
+models/autogluon_models/
+models/xgboost_models/
+
+# Runtime data files
+farm_data_*.json
+demo_farm_data_*.json
+
+# API / Server logs
+*.log
+farm_operations.log
+
+# Web build artifacts
+web/dist/
+web/node_modules/
+web/app/ai-assistant/shrimp-farm-ai-assistant/web/dist/
+web/app/ai-assistant/shrimp-farm-ai-assistant/web/node_modules/
