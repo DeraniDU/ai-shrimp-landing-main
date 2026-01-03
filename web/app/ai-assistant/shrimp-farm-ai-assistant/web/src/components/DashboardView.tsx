@@ -1,0 +1,868 @@
+import { Bar, Line } from 'react-chartjs-2'
+import {
+	Chart as ChartJS,
+	CategoryScale,
+	LinearScale,
+	BarElement,
+	Tooltip,
+	Legend,
+	LineElement,
+	PointElement,
+	Filler,
+	type ChartOptions
+} from 'chart.js'
+import type { ReactNode } from 'react'
+import { formatDateTime, formatNumber, formatPercent01 } from '../lib/format'
+import type {
+	DashboardApiResponse,
+	DecisionOutput,
+	DecisionRecommendation,
+	SavedFarmSnapshot,
+	WaterQualityStatus
+} from '../lib/types'
+import { WaterStatusBadge } from './StatusBadge'
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Filler, Tooltip, Legend)
+
+type Props = {
+	data: DashboardApiResponse
+	history: SavedFarmSnapshot[]
+	pondFilter: number | null
+}
+
+export function DashboardView({ data, history, pondFilter }: Props) {
+	const { dashboard } = data
+	const water = pondFilter ? data.water_quality.filter((w) => w.pond_id === pondFilter) : data.water_quality
+	const feed = pondFilter ? data.feed.filter((f) => f.pond_id === pondFilter) : data.feed
+	const energy = pondFilter ? data.energy.filter((e) => e.pond_id === pondFilter) : data.energy
+	const labor = pondFilter ? data.labor.filter((l) => l.pond_id === pondFilter) : data.labor
+
+	const pondIds = water.map((w) => w.pond_id)
+
+	const gridColor = 'rgba(17, 24, 39, 0.08)'
+	const axisColor = 'rgba(17, 24, 39, 0.55)'
+
+	const barOptions: ChartOptions<'bar'> = {
+		responsive: true,
+		maintainAspectRatio: false,
+		plugins: {
+			legend: { display: false }
+		},
+		scales: {
+			x: { grid: { display: false }, ticks: { color: axisColor } },
+			y: { grid: { color: gridColor }, ticks: { color: axisColor } }
+		}
+	}
+
+	const lineOptions: ChartOptions<'line'> = {
+		responsive: true,
+		maintainAspectRatio: false,
+		plugins: { legend: { display: false } },
+		scales: {
+			x: { grid: { display: false }, ticks: { color: axisColor } },
+			y: { grid: { color: gridColor }, ticks: { color: axisColor } }
+		},
+		elements: { point: { radius: 3, hoverRadius: 4 } }
+	}
+
+	const waterStatus = summarizeWaterStatus(water.map((w) => w.status))
+	const avgPh = avg(water.map((w) => w.ph))
+	const avgSalinity = avg(water.map((w) => w.salinity))
+	const avgOxygen = avg(water.map((w) => w.dissolved_oxygen))
+	const avgTemp = avg(water.map((w) => w.temperature))
+	const totalFeedG = sum(feed.map((f) => f.feed_amount))
+	const totalEnergyKwh = sum(energy.map((e) => e.total_energy))
+	const totalEnergyCost = sum(energy.map((e) => e.cost))
+
+	const actions = data.decisions?.recommended_actions ? Object.values(data.decisions.recommended_actions) : []
+	const filteredActions = pondFilter ? actions.filter((a) => a.pond_id === pondFilter) : actions
+	const decisionsSorted = [...filteredActions].sort((a, b) => a.priority_rank - b.priority_rank)
+	const decisionRecos = (data.decision_recommendations ?? [])
+		.filter((r) => (pondFilter ? r.pond_id === pondFilter : true))
+		.sort((a, b) => a.priority_rank - b.priority_rank)
+	const hasAction = (action: string) => filteredActions.some((a) => a.primary_action === action || a.secondary_actions?.includes(action as never))
+	const aeratorsOn = hasAction('increase_aeration') || avg(energy.map((e) => (typeof e.aerator_usage === 'number' ? e.aerator_usage : 0))) > 0.35
+	const pumpsOn = hasAction('water_exchange') || avg(energy.map((e) => (typeof e.pump_usage === 'number' ? e.pump_usage : 0))) > 0.25
+	const feederActive = totalFeedG > 0
+
+	const historyFiltered = history.map((snap) => ({
+		...snap,
+		water_quality: pondFilter ? snap.water_quality.filter((w) => w.pond_id === pondFilter) : snap.water_quality,
+		feed: pondFilter ? snap.feed.filter((f) => f.pond_id === pondFilter) : snap.feed
+	}))
+	const historyLabels = historyFiltered.map((h) => shortDate(h.timestamp))
+	const historyAvgWeight = historyFiltered.map((h) => avg(h.feed.map((f) => f.average_weight)))
+	const historyTotalFeedKg = historyFiltered.map((h) => sum(h.feed.map((f) => f.feed_amount)) / 1000)
+
+	const latestBiomassKg = sum(feed.map((f) => (f.shrimp_count * f.average_weight) / 1000)) // g -> kg
+	const projectedHarvestTons = latestBiomassKg / 1000
+	const shrimpPricePerKg = 6.5
+	const feedCostPerKg = 1.2
+	const estimatedRevenue = latestBiomassKg * shrimpPricePerKg
+	const estimatedCosts = totalEnergyCost + (totalFeedG / 1000) * feedCostPerKg
+	const profitMargin = estimatedRevenue > 0 ? (estimatedRevenue - estimatedCosts) / estimatedRevenue : 0
+	const fcr = inferFcr(historyFiltered)
+	const decisionSourceLabel = data.decision_agent_type ? String(data.decision_agent_type) : 'No decision model'
+	const topActions = decisionsSorted.slice(0, 4)
+	const recosByPond = groupBy(decisionRecos, (r) => String(r.pond_id))
+
+	const alerts = buildAlerts({ dashboardAlerts: dashboard.alerts ?? [], water })
+	const alertCounts = countAlerts(alerts)
+
+	const growthChart = {
+		labels: historyLabels,
+		datasets: [
+			{
+				type: 'line' as const,
+				label: 'Avg. Size (g)',
+				data: historyAvgWeight,
+				borderColor: '#2563eb',
+				backgroundColor: 'rgba(37, 99, 235, 0.10)',
+				fill: true,
+				tension: 0.35
+			},
+			{
+				type: 'bar' as const,
+				label: 'Feed (kg)',
+				data: historyTotalFeedKg,
+				backgroundColor: 'rgba(245, 158, 11, 0.70)',
+				borderRadius: 6,
+				maxBarThickness: 18
+			}
+		]
+	}
+
+	const feedChart = {
+		labels: historyLabels,
+		datasets: [
+			{
+				label: 'Daily feed (kg)',
+				data: historyTotalFeedKg,
+				backgroundColor: 'rgba(59, 130, 246, 0.85)',
+				borderRadius: 6,
+				maxBarThickness: 18
+			}
+		]
+	}
+
+	const yieldSeriesTons = historyFiltered.map((h) => sum(h.feed.map((f) => (f.shrimp_count * f.average_weight) / 1000)) / 1000)
+	const revenueSeries = historyFiltered.map((h) => {
+		const biomassKg = sum(h.feed.map((f) => (f.shrimp_count * f.average_weight) / 1000))
+		return biomassKg * shrimpPricePerKg
+	})
+
+	const yieldChart = {
+		labels: historyLabels,
+		datasets: [
+			{
+				type: 'bar' as const,
+				label: 'Yield (tons)',
+				data: yieldSeriesTons,
+				backgroundColor: 'rgba(34, 197, 94, 0.75)',
+				borderRadius: 6,
+				maxBarThickness: 18,
+				yAxisID: 'y'
+			},
+			{
+				type: 'line' as const,
+				label: 'Revenue ($)',
+				data: revenueSeries,
+				borderColor: 'rgba(37, 99, 235, 0.95)',
+				backgroundColor: 'rgba(37, 99, 235, 0.10)',
+				fill: true,
+				tension: 0.35,
+				yAxisID: 'y1'
+			}
+		]
+	}
+
+	const yieldOptions: ChartOptions<'bar'> = {
+		responsive: true,
+		maintainAspectRatio: false,
+		plugins: { legend: { display: false } },
+		scales: {
+			x: { grid: { display: false }, ticks: { color: axisColor } },
+			y: { grid: { color: gridColor }, ticks: { color: axisColor }, title: { display: false, text: 'Tons' } },
+			y1: {
+				position: 'right',
+				grid: { display: false },
+				ticks: { color: axisColor, callback: (v) => `$${Number(v) / 1000}k` }
+			}
+		}
+	}
+
+	return (
+		<div className="dashGrid">
+			<div className="panel">
+				<PanelHeader title="Water Quality" right={<WaterStatusBadge status={waterStatus.status} />} />
+				<div className="waterCards">
+					<ValueCard title="PH" value={formatNumber(avgPh, { maximumFractionDigits: 1 })} unit="" badge={phBadge(avgPh)} />
+					<ValueCard title="Salinity" value={formatNumber(avgSalinity, { maximumFractionDigits: 0 })} unit="ppt" badge={salinityBadge(avgSalinity)} />
+					<ValueCard title="Oxygen" value={formatNumber(avgOxygen, { maximumFractionDigits: 1 })} unit="mg/L" badge={oxygenBadge(avgOxygen)} />
+				</div>
+				<div className="tempCard">
+					<div className="tempRow">
+						<div className="tempTitle">Temperature</div>
+						<div className="tempValue">
+							<span className="mono">{formatNumber(avgTemp, { maximumFractionDigits: 1 })}</span>
+							<span className="tempUnit">°C</span>
+						</div>
+					</div>
+					<div className="tempWaves" aria-hidden="true" />
+				</div>
+				<div className="muted" style={{ marginTop: 10 }}>
+					{pondFilter ? `Viewing Pond ${pondFilter}` : `${pondIds.length} ponds`} · {dashboard.alerts?.length ? `${dashboard.alerts.length} alert(s)` : 'No alerts'}
+				</div>
+			</div>
+
+			<div className="panel">
+				<PanelHeader title="Shrimp Growth & Feeding" right={<span className="muted">Updated {formatDateTime(dashboard.timestamp)}</span>} />
+				<div className="twoCharts">
+					<div className="chartPanel">
+						<div className="chartTitle">Shrimp Growth</div>
+						<div className="chartBoxSm">
+							<Line data={growthChart as never} options={lineOptions} />
+						</div>
+						<div className="chartLegend">
+							<span className="legendSwatch blue" /> Avg. Size (g)
+							<span className="legendSwatch amber" style={{ marginLeft: 14 }} /> Feed (kg)
+						</div>
+					</div>
+					<div className="chartPanel">
+						<div className="chartTitle">
+							Feed Consumption <span className="muted">Daily Feed: </span>
+							<span className="mono">{formatNumber(totalFeedG / 1000, { maximumFractionDigits: 0 })}</span> kg
+						</div>
+						<div className="chartBoxSm">
+							<Bar data={feedChart} options={barOptions} />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div className="panel">
+				<PanelHeader title="AI Automation Controls" />
+				<div className="controlList">
+					<ControlRow label="Feeder System" state={feederActive ? 'ACTIVE' : 'IDLE'} tone={feederActive ? 'good' : 'info'} />
+					<ControlRow label="Aerators" state={aeratorsOn ? 'ON' : 'OFF'} tone={aeratorsOn ? 'good' : 'warn'} />
+					<ControlRow label="Water Pumps" state={pumpsOn ? 'ON' : 'OFF'} tone={pumpsOn ? 'good' : 'warn'} />
+					<ControlRow label="Health Monitoring" state="RUNNING" tone="good" />
+				</div>
+				<div className="controlButtons">
+					<ActionButton label="Feed" />
+					<ActionButton label="Aerate" />
+					<ActionButton label="Pump" />
+					<ActionButton label="Clean" />
+				</div>
+				<div className="muted" style={{ marginTop: 10 }}>
+					Energy: <span className="mono">{formatNumber(totalEnergyKwh, { maximumFractionDigits: 1 })}</span> kWh · Cost: $
+					<span className="mono">{formatNumber(totalEnergyCost, { maximumFractionDigits: 2 })}</span>
+				</div>
+			</div>
+
+			<div className="panel">
+				<PanelHeader title="Farm Camera Feed" />
+				<div className="camera">
+					<div className="cameraViewport" role="img" aria-label="Camera feed placeholder">
+						<div className="cameraOverlay">
+							<div className="cameraPill">
+								<span className="check" aria-hidden="true">
+									✓
+								</span>
+								<span>
+									Health Status: <b>Healthy</b>
+								</span>
+							</div>
+							<div className="cameraIcons" aria-hidden="true">
+								<span className="iconBox" />
+								<span className="iconBox" />
+							</div>
+						</div>
+					</div>
+					<div className="cameraBadges">
+						<SmallBadge tone="good" label="Normal Activity" />
+						<SmallBadge tone="good" label="No Disease Detected" />
+						<SmallBadge tone="good" label="Clear Water" />
+					</div>
+				</div>
+			</div>
+
+			<div className="panel">
+				<PanelHeader title="Yield & Profit Analysis" />
+				<div className="summaryStrip">
+					<div className="summaryItem">
+						<div className="muted">Projected Harvest:</div>
+						<div className="summaryValue mono">{formatNumber(projectedHarvestTons, { maximumFractionDigits: 1 })} Tons</div>
+					</div>
+					<div className="summaryItem">
+						<div className="muted">Estimated Revenue:</div>
+						<div className="summaryValue mono">${formatNumber(estimatedRevenue, { maximumFractionDigits: 0 })}</div>
+					</div>
+				</div>
+				<div className="chartBoxLg">
+					<Bar data={yieldChart as never} options={yieldOptions} />
+				</div>
+				<div className="kpiStrip">
+					<div className="kpiMini">
+						<div className="muted">FCR</div>
+						<div className="kpiMiniValue mono">{typeof fcr === 'number' ? formatNumber(fcr, { maximumFractionDigits: 2 }) : '—'}</div>
+					</div>
+					<div className="kpiMini">
+						<div className="muted">Profit Margin</div>
+						<div className="kpiMiniValue mono">{formatNumber(profitMargin * 100, { maximumFractionDigits: 0 })}%</div>
+					</div>
+				</div>
+			</div>
+
+			<div className="panel">
+				<PanelHeader title="IoT Sensor Network" />
+				<div className="map">
+					<div className="mapBg" aria-hidden="true" />
+					{pondIds.map((id, idx) => (
+						<MapMarker key={id} pondId={id} idx={idx} status={water.find((w) => w.pond_id === id)?.status ?? 'good'} />
+					))}
+				</div>
+				<div className="legendRow">
+					<LegendDot color="#ef4444" label="Temp" />
+					<LegendDot color="#2563eb" label="DO" />
+					<LegendDot color="#22c55e" label="pH" />
+					<LegendDot color="#60a5fa" label="Salinity" />
+				</div>
+			</div>
+
+			<div className="panel spanAll">
+				<PanelHeader
+					title="Alerts"
+					right={
+						<div className="alertSummary">
+							<Chip label={`Critical ${alertCounts.bad}`} tone="bad" />
+							<Chip label={`Warning ${alertCounts.warn}`} tone="warn" />
+							<Chip label={`Info ${alertCounts.info}`} tone="info" />
+						</div>
+					}
+				/>
+				{alerts.length ? (
+					<div className="alertsList">
+						{alerts.slice(0, 10).map((a, i) => (
+							<div key={`${a.source}-${i}`} className="alertRow">
+								<span className={`alertDot ${a.tone}`} aria-hidden="true" />
+								<div className="alertTextWrap">
+									<div className="alertText">{a.text}</div>
+									<div className="alertMeta muted">
+										{a.pondId ? <span className="mono">Pond {a.pondId}</span> : null}
+										{a.pondId ? ' · ' : ''}
+										{a.source}
+									</div>
+								</div>
+								<div className="alertRight">
+									<Chip label={a.label} tone={a.tone} />
+								</div>
+							</div>
+						))}
+					</div>
+				) : (
+					<div className="emptyState">No active alerts.</div>
+				)}
+			</div>
+
+			{dashboard.recommendations && dashboard.recommendations.length > 0 ? (
+				<div className="panel spanAll">
+					<PanelHeader
+						title="AI Strategic Recommendations"
+						right={<span className="muted">{dashboard.recommendations.length} recommendation(s)</span>}
+					/>
+					<div className="alertsList">
+						{dashboard.recommendations.map((rec, i) => {
+							// Parse markdown-style recommendations (e.g., "**Pond 1**: ...")
+							const parts = rec.split(/(\*\*[^*]+\*\*)/g)
+							return (
+								<div
+									key={i}
+									className="alertRow"
+									style={{
+										gridTemplateColumns: '1fr',
+										padding: '12px 16px',
+										borderLeft: '3px solid rgba(37, 99, 235, 0.6)'
+									}}
+								>
+									<div className="alertTextWrap" style={{ width: '100%' }}>
+										<div className="alertText" style={{ color: 'rgba(17, 24, 39, 0.84)', lineHeight: '1.6' }}>
+											{parts.map((part, j) => {
+												if (part.startsWith('**') && part.endsWith('**')) {
+													const text = part.slice(2, -2)
+													return <strong key={j} style={{ color: 'rgba(17, 24, 39, 0.95)' }}>{text}</strong>
+												}
+												return <span key={j}>{part}</span>
+											})}
+										</div>
+									</div>
+								</div>
+							)
+						})}
+					</div>
+				</div>
+			) : null}
+
+			<div className="panel spanAll">
+				<PanelHeader
+					title="Decision Agent (XGBoost)"
+					right={
+						<span className="muted">
+							Source: <span className="mono">{decisionSourceLabel}</span>
+							{typeof data.decisions?.overall_urgency === 'number'
+								? ` · Overall urgency: ${formatPercent01(data.decisions.overall_urgency)}`
+								: ''}
+						</span>
+					}
+				/>
+
+				{topActions.length ? (
+					<div className="decisionCards">
+						{topActions.map((d) => (
+							<DecisionCard key={d.pond_id} d={d} />
+						))}
+					</div>
+				) : (
+					<div className="emptyState">
+						No decision outputs available. If you trained the XGBoost model, make sure it’s enabled in the backend and refresh.
+					</div>
+				)}
+
+				<div className="decisionGrid">
+					<div className="decisionBlock">
+						<div className="decisionBlockTitle">Action plan</div>
+						{decisionRecos.length ? (
+							<div className="recoGroups">
+								{Object.entries(recosByPond)
+									.sort(([a], [b]) => Number(a) - Number(b))
+									.map(([pondId, items]) => (
+										<div key={pondId} className="recoGroup">
+											<div className="recoHeader">
+												<Chip label={`Pond ${pondId}`} tone="info" />
+												<span className="muted">{items.length} item(s)</span>
+											</div>
+											<ul className="decisionList">
+												{items.slice(0, 6).map((r: DecisionRecommendation, i) => (
+													<li key={`${r.pond_id}-${i}`}>{r.text}</li>
+												))}
+											</ul>
+										</div>
+									))}
+							</div>
+						) : (
+							<div className="emptyState">No decision-based recommendations available.</div>
+						)}
+
+						<div className="decisionMiniGrid">
+							<MiniStat label="Filtered ponds" value={pondFilter ? `1 (Pond ${pondFilter})` : String(water.length)} />
+							<MiniStat label="Generated recos" value={String(decisionRecos.length)} />
+						</div>
+					</div>
+
+					<div className="decisionBlock">
+						<div className="decisionBlockTitle">Details</div>
+						<div className="muted" style={{ marginBottom: 10 }}>
+							Expanded view of model outputs (all ponds in view).
+						</div>
+						<details className="details">
+							<summary className="detailsSummary">
+								<span>Show per-pond decision table</span>
+								<span className="muted">{decisionsSorted.length} row(s)</span>
+							</summary>
+							<div className="tableWrap" style={{ marginTop: 10 }}>
+								<table className="table">
+									<thead>
+										<tr>
+											<th>Pond</th>
+											<th>Primary action</th>
+											<th className="right">Urgency</th>
+											<th className="right">Confidence</th>
+											<th>Suggested settings</th>
+										</tr>
+									</thead>
+									<tbody>
+										{decisionsSorted.map((d: DecisionOutput) => (
+											<tr key={d.pond_id}>
+												<td className="mono">Pond {d.pond_id}</td>
+												<td>
+													<div className="mono">
+														#{d.priority_rank} · {actionLabel(d.primary_action)}
+													</div>
+													{d.secondary_actions?.length ? (
+														<div className="muted" style={{ marginTop: 2 }}>
+															Secondary: {d.secondary_actions.map((a) => actionLabel(a)).join(', ')}
+														</div>
+													) : null}
+												</td>
+												<td className="right">
+													<div className="inlineRight">
+														<Chip label={formatPercent01(d.urgency_score)} tone={toneForScore(d.urgency_score)} />
+													</div>
+												</td>
+												<td className="right">
+													<div className="inlineRight">
+														<Chip label={formatPercent01(d.confidence)} tone={toneForScore(d.confidence)} />
+													</div>
+												</td>
+												<td className="muted">
+													{formatSettings(d)}
+													{d.reasoning ? (
+														<div style={{ marginTop: 6 }}>
+															<details className="why">
+																<summary className="whySummary">Why?</summary>
+																<div className="whyBody">{d.reasoning}</div>
+															</details>
+														</div>
+													) : null}
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</div>
+						</details>
+
+						{data.decisions?.resource_allocation ? (
+							<div className="muted" style={{ marginTop: 10 }}>
+								Resource allocation: <span className="mono">{JSON.stringify(data.decisions.resource_allocation)}</span>
+							</div>
+						) : null}
+					</div>
+				</div>
+			</div>
+		</div>
+	)
+}
+
+function PanelHeader({ title, right }: { title: string; right?: ReactNode }) {
+	return (
+		<div className="panelHeader">
+			<div className="panelTitle">{title}</div>
+			<div className="panelRight">
+				{right ?? null}
+				<span className="panelCollapse" aria-hidden="true">
+					—
+				</span>
+			</div>
+		</div>
+	)
+}
+
+function ValueCard({
+	title,
+	value,
+	unit,
+	badge
+}: {
+	title: string
+	value: string
+	unit: string
+	badge: { label: string; tone: 'good' | 'warn' | 'info' }
+}) {
+	return (
+		<div className="valueCard">
+			<div className="valueTitle">{title}</div>
+			<div className="valueMain">
+				<span className="valueNumber mono">{value}</span>
+				{unit ? <span className="valueUnit">{unit}</span> : null}
+			</div>
+			<div className={`valueBadge ${badge.tone}`}>{badge.label}</div>
+		</div>
+	)
+}
+
+function ControlRow({ label, state, tone }: { label: string; state: string; tone: 'good' | 'warn' | 'info' }) {
+	return (
+		<div className="controlRow">
+			<div className="controlLabel">{label}</div>
+			<div className={`controlState ${tone}`}>{state}</div>
+		</div>
+	)
+}
+
+function ActionButton({ label }: { label: string }) {
+	return (
+		<button className="actionBtn" onClick={() => void 0} type="button">
+			{label}
+		</button>
+	)
+}
+
+function SmallBadge({ tone, label }: { tone: 'good' | 'warn' | 'info'; label: string }) {
+	return <div className={`smallBadge ${tone}`}>{label}</div>
+}
+
+function MapMarker({ pondId, idx, status }: { pondId: number; idx: number; status: WaterQualityStatus }) {
+	const positions = [
+		{ left: '18%', top: '22%' },
+		{ left: '26%', top: '54%' },
+		{ left: '72%', top: '56%' },
+		{ left: '48%', top: '72%' },
+		{ left: '68%', top: '28%' },
+		{ left: '40%', top: '38%' },
+		{ left: '84%', top: '34%' },
+		{ left: '12%', top: '70%' }
+	]
+	const pos = positions[idx % positions.length]
+	const tone = status === 'excellent' || status === 'good' ? 'good' : status === 'fair' ? 'warn' : 'bad'
+	return (
+		<div className={`mapMarker ${tone}`} style={{ left: pos.left, top: pos.top }}>
+			<div className="pin" aria-hidden="true" />
+			<div className="mapLabel">Pond {pondId}</div>
+		</div>
+	)
+}
+
+function LegendDot({ color, label }: { color: string; label: string }) {
+	return (
+		<div className="legendDot">
+			<span className="dotSwatch" style={{ background: color }} aria-hidden="true" />
+			<span className="muted">{label}</span>
+		</div>
+	)
+}
+
+function MiniStat({ label, value }: { label: string; value: string }) {
+	return (
+		<div className="miniStat">
+			<div className="muted">{label}</div>
+			<div className="miniStatValue mono">{value}</div>
+		</div>
+	)
+}
+
+function DecisionCard({ d }: { d: DecisionOutput }) {
+	const urgencyTone = toneForScore(d.urgency_score)
+	const confTone = toneForScore(d.confidence)
+	return (
+		<div className="decisionCard">
+			<div className="decisionCardTop">
+				<div>
+					<div className="decisionCardTitle">
+						<Chip label={`#${d.priority_rank}`} tone="info" /> <span className="mono">Pond {d.pond_id}</span>
+					</div>
+					<div className="decisionCardAction">{actionLabel(d.primary_action)}</div>
+				</div>
+				<div className="decisionCardBadges">
+					<Chip label={`Urgency ${formatPercent01(d.urgency_score)}`} tone={urgencyTone} />
+					<Chip label={`Conf ${formatPercent01(d.confidence)}`} tone={confTone} />
+				</div>
+			</div>
+
+			<div className="decisionBars">
+				<BarMeter label="Urgency" value01={clamp01(d.urgency_score)} tone={urgencyTone} />
+				<BarMeter label="Confidence" value01={clamp01(d.confidence)} tone={confTone} />
+			</div>
+
+			<div className="decisionSettings">
+				<div className="muted">Suggested settings</div>
+				<div className="settingsGrid">
+					<SettingItem label="Feed" value={fmtMaybeNumber(d.recommended_feed_amount, 'g')} />
+					<SettingItem label="Aerator" value={fmtMaybeNumber(d.recommended_aerator_level, '%')} />
+					<SettingItem label="Pump" value={fmtMaybeNumber(d.recommended_pump_level, '%')} />
+					<SettingItem label="Heater" value={fmtMaybeNumber(d.recommended_heater_level, '%')} />
+				</div>
+			</div>
+		</div>
+	)
+}
+
+function BarMeter({ label, value01, tone }: { label: string; value01: number; tone: ChipTone }) {
+	return (
+		<div className="barMeter">
+			<div className="barMeterRow">
+				<span className="muted">{label}</span>
+				<span className="mono">{formatNumber(value01 * 100, { maximumFractionDigits: 0 })}%</span>
+			</div>
+			<div className="barTrack">
+				<div className={`barFill ${tone}`} style={{ width: `${Math.round(value01 * 100)}%` }} />
+			</div>
+		</div>
+	)
+}
+
+function SettingItem({ label, value }: { label: string; value: string }) {
+	return (
+		<div className="settingItem">
+			<div className="muted">{label}</div>
+			<div className="settingValue mono">{value}</div>
+		</div>
+	)
+}
+
+type ChipTone = 'good' | 'warn' | 'bad' | 'info'
+
+function Chip({ label, tone }: { label: string; tone: ChipTone }) {
+	return <span className={`chip ${tone}`}>{label}</span>
+}
+
+function summarizeWaterStatus(statuses: WaterQualityStatus[]) {
+	// Worst status wins.
+	const order: WaterQualityStatus[] = ['excellent', 'good', 'fair', 'poor', 'critical']
+	let worst: WaterQualityStatus = 'excellent'
+	for (const s of statuses) {
+		if (order.indexOf(s) > order.indexOf(worst)) worst = s
+	}
+	return { status: worst, label: worst.toUpperCase(), count: statuses.length }
+}
+
+function sum(values: number[]) {
+	return values.reduce((a, b) => a + b, 0)
+}
+
+function avg(values: number[]) {
+	if (!values.length) return 0
+	return sum(values) / values.length
+}
+
+function shortDate(iso: string) {
+	const d = new Date(iso)
+	if (Number.isNaN(d.getTime())) return iso
+	return d.toLocaleDateString(undefined, { month: 'short', day: '2-digit' })
+}
+
+function phBadge(ph: number) {
+	if (ph >= 7.5 && ph <= 8.5) return { label: 'Optimal', tone: 'info' as const }
+	if (ph >= 7.0 && ph <= 9.0) return { label: 'Normal', tone: 'warn' as const }
+	return { label: 'Alert', tone: 'warn' as const }
+}
+
+function salinityBadge(sal: number) {
+	if (sal >= 15 && sal <= 25) return { label: 'Normal', tone: 'good' as const }
+	if (sal >= 10 && sal <= 30) return { label: 'Caution', tone: 'warn' as const }
+	return { label: 'Alert', tone: 'warn' as const }
+}
+
+function oxygenBadge(o2: number) {
+	if (o2 >= 6.0) return { label: 'Good', tone: 'good' as const }
+	if (o2 >= 5.0) return { label: 'Caution', tone: 'warn' as const }
+	return { label: 'Low', tone: 'warn' as const }
+}
+
+function inferFcr(historyFiltered: Array<{ feed: Array<{ shrimp_count: number; average_weight: number; feed_amount: number }> }>) {
+	if (historyFiltered.length < 2) return null
+	const last = historyFiltered[historyFiltered.length - 1]
+	const prev = historyFiltered[historyFiltered.length - 2]
+	const biomassKg = (h: typeof last) => sum(h.feed.map((f) => (f.shrimp_count * f.average_weight) / 1000))
+	const gain = biomassKg(last) - biomassKg(prev)
+	if (gain <= 0) return null
+	const feedKg = sum(last.feed.map((f) => f.feed_amount)) / 1000
+	return feedKg / gain
+}
+
+function actionLabel(action: string) {
+	const map: Record<string, string> = {
+		no_action: 'No action',
+		increase_aeration: 'Increase aeration',
+		decrease_aeration: 'Decrease aeration',
+		water_exchange: 'Water exchange',
+		adjust_feed: 'Adjust feed',
+		emergency_response: 'Emergency response',
+		allocate_workers: 'Allocate workers',
+		equipment_maintenance: 'Equipment maintenance',
+		monitor_closely: 'Monitor closely'
+	}
+	if (map[action]) return map[action]
+	return String(action)
+		.replace(/_/g, ' ')
+		.replace(/\b\w/g, (m: string) => m.toUpperCase())
+}
+
+function toneForScore(v: number): ChipTone {
+	const x = clamp01(v)
+	if (x >= 0.8) return 'bad'
+	if (x >= 0.6) return 'warn'
+	if (x >= 0.3) return 'info'
+	return 'good'
+}
+
+function clamp01(v: number) {
+	if (!Number.isFinite(v)) return 0
+	return Math.max(0, Math.min(1, v))
+}
+
+function fmtMaybeNumber(v: number | null, unit: string) {
+	if (v === null || !Number.isFinite(v)) return '—'
+	// If unit is %, treat as 0..1 (common for levels) and also accept 0..100.
+	if (unit === '%') {
+		const pct = v <= 1 ? v * 100 : v
+		return `${formatNumber(pct, { maximumFractionDigits: 0 })}${unit}`
+	}
+	return `${formatNumber(v, { maximumFractionDigits: 0 })} ${unit}`
+}
+
+function formatSettings(d: DecisionOutput) {
+	const parts: string[] = []
+	if (d.recommended_feed_amount != null) parts.push(`Feed ${fmtMaybeNumber(d.recommended_feed_amount, 'g')}`)
+	if (d.recommended_aerator_level != null) parts.push(`Aerator ${fmtMaybeNumber(d.recommended_aerator_level, '%')}`)
+	if (d.recommended_pump_level != null) parts.push(`Pump ${fmtMaybeNumber(d.recommended_pump_level, '%')}`)
+	if (d.recommended_heater_level != null) parts.push(`Heater ${fmtMaybeNumber(d.recommended_heater_level, '%')}`)
+	return parts.length ? parts.join(' · ') : '—'
+}
+
+function groupBy<T>(items: T[], key: (t: T) => string) {
+	return items.reduce<Record<string, T[]>>((acc, item) => {
+		const k = key(item)
+		if (!acc[k]) acc[k] = []
+		acc[k].push(item)
+		return acc
+	}, {})
+}
+
+function buildAlerts(params: { dashboardAlerts: string[]; water: Array<{ pond_id: number; alerts: string[] }> }) {
+	const { dashboardAlerts, water } = params
+	const out: Array<{ text: string; tone: ChipTone; label: string; pondId: number | null; source: string }> = []
+
+	for (const text of dashboardAlerts) {
+		const level = inferAlertTone(text)
+		out.push({ text, tone: level.tone, label: level.label, pondId: inferPondId(text), source: 'Dashboard' })
+	}
+
+	for (const w of water) {
+		for (const text of w.alerts ?? []) {
+			const level = inferAlertTone(text)
+			out.push({ text, tone: level.tone, label: level.label, pondId: w.pond_id, source: 'Water quality' })
+		}
+	}
+
+	// Dedupe on (text, pondId, source)
+	const seen = new Set<string>()
+	const deduped: typeof out = []
+	for (const a of out) {
+		const k = `${a.source}|${a.pondId ?? ''}|${a.text}`
+		if (seen.has(k)) continue
+		seen.add(k)
+		deduped.push(a)
+	}
+
+	// Sort: critical, warning, info.
+	const order: Record<ChipTone, number> = { bad: 0, warn: 1, info: 2, good: 3 }
+	deduped.sort((a, b) => order[a.tone] - order[b.tone])
+	return deduped
+}
+
+function inferPondId(text: string): number | null {
+	const m = text.match(/pond\s*(\d+)/i)
+	if (!m) return null
+	const n = Number(m[1])
+	return Number.isFinite(n) ? n : null
+}
+
+function inferAlertTone(text: string): { tone: ChipTone; label: string } {
+	const t = text.toLowerCase()
+	if (t.includes('critical')) return { tone: 'bad', label: 'CRITICAL' }
+	if (t.includes('warning')) return { tone: 'warn', label: 'WARNING' }
+	return { tone: 'info', label: 'INFO' }
+}
+
+function countAlerts(alerts: Array<{ tone: ChipTone }>) {
+	const counts = { bad: 0, warn: 0, info: 0 }
+	for (const a of alerts) {
+		if (a.tone === 'bad') counts.bad += 1
+		else if (a.tone === 'warn') counts.warn += 1
+		else if (a.tone === 'info') counts.info += 1
+	}
+	return counts
+}
+
+
