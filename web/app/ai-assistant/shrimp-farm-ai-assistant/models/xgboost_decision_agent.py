@@ -115,7 +115,7 @@ class XGBoostDecisionAgent:
 
             self.is_trained = True
 
-    def make_decision(
+    def make_decision(  
         self,
         water_quality_data: List[WaterQualityData],
         feed_data: List[FeedData],
