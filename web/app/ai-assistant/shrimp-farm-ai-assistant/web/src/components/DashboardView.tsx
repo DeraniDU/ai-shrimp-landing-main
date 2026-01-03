@@ -12,6 +12,7 @@ import {
 	type ChartOptions
 } from 'chart.js'
 import type { ReactNode } from 'react'
+import { useState } from 'react'
 import { formatDateTime, formatNumber, formatPercent01 } from '../lib/format'
 import type {
 	DashboardApiResponse,
@@ -402,6 +403,154 @@ export function DashboardView({ data, history, pondFilter }: Props) {
 					</div>
 				</div>
 			) : null}
+
+			{dashboard.insights && dashboard.insights.length > 0 ? (
+				<div className="panel spanAll">
+					<PanelHeader
+						title="Manager Agent Insights"
+						right={
+							<div className="alertSummary">
+								{(() => {
+									const counts = { critical: 0, warning: 0, info: 0 }
+									dashboard.insights.forEach((insight) => {
+										if (insight.priority === 'critical') counts.critical++
+										else if (insight.priority === 'warning') counts.warning++
+										else counts.info++
+									})
+									return (
+										<>
+											{counts.critical > 0 && <Chip label={`Critical ${counts.critical}`} tone="bad" />}
+											{counts.warning > 0 && <Chip label={`Warning ${counts.warning}`} tone="warn" />}
+											{counts.info > 0 && <Chip label={`Info ${counts.info}`} tone="info" />}
+										</>
+									)
+								})()}
+							</div>
+						}
+					/>
+					<div className="alertsList">
+						{dashboard.insights
+							.sort((a, b) => {
+								// Sort by priority: critical > warning > info
+								const priorityOrder: Record<string, number> = { critical: 0, warning: 1, info: 2 }
+								return priorityOrder[a.priority] - priorityOrder[b.priority]
+							})
+							.map((insight, i) => {
+								const priorityTone: ChipTone = insight.priority === 'critical' ? 'bad' : insight.priority === 'warning' ? 'warn' : 'info'
+								const borderColor =
+									insight.priority === 'critical'
+										? 'rgba(239, 68, 68, 0.6)'
+										: insight.priority === 'warning'
+											? 'rgba(245, 158, 11, 0.6)'
+											: 'rgba(59, 130, 246, 0.6)'
+								return (
+									<div
+										key={i}
+										className="insightCard"
+										style={{
+											borderLeft: `4px solid ${borderColor}`,
+											padding: '16px',
+											marginBottom: '12px',
+											backgroundColor: 'rgba(255, 255, 255, 0.5)',
+											borderRadius: '8px'
+										}}
+									>
+										<div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '8px' }}>
+											<div style={{ flex: 1 }}>
+												<div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+													<Chip label={insight.insight_type} tone={priorityTone} />
+													{insight.affected_ponds && insight.affected_ponds.length > 0 && (
+														<span className="muted" style={{ fontSize: '0.875rem' }}>
+															Ponds: {insight.affected_ponds.map((id) => `Pond ${id}`).join(', ')}
+														</span>
+													)}
+												</div>
+												<div className="alertText" style={{ color: 'rgba(17, 24, 39, 0.9)', marginBottom: '8px', lineHeight: '1.5' }}>
+													{insight.message}
+												</div>
+												{insight.recommendations && insight.recommendations.length > 0 && (
+													<div style={{ marginTop: '10px' }}>
+														<div className="muted" style={{ fontSize: '0.875rem', marginBottom: '6px', fontWeight: 500 }}>
+															Recommendations:
+														</div>
+														<ul style={{ margin: 0, paddingLeft: '20px', color: 'rgba(17, 24, 39, 0.75)' }}>
+															{insight.recommendations.map((rec, j) => (
+																<li key={j} style={{ marginBottom: '4px', lineHeight: '1.5' }}>
+																	{rec}
+																</li>
+															))}
+														</ul>
+													</div>
+												)}
+											</div>
+											<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+												<Chip label={insight.priority.toUpperCase()} tone={priorityTone} />
+												<span className="muted" style={{ fontSize: '0.75rem' }}>
+													{formatDateTime(insight.timestamp)}
+												</span>
+											</div>
+										</div>
+									</div>
+								)
+							})}
+					</div>
+				</div>
+			) : null}
+
+			<div className="panel spanAll">
+				<PanelHeader title="AI Recommendations" />
+				<div className="actionPlanGrid">
+					{/* Best Feeding Plan */}
+					<ActionPlanCard
+						title="Best Feeding Plan"
+						icon="🔄"
+						details={[
+							`Feed: **${formatNumber(totalFeedG / 1000, { maximumFractionDigits: 1 })} kg** at **7:00 AM** and **8:00 PM**`,
+							`Feed Type: **${feed.length > 0 ? feed[0].feed_type : '35% protein, balanced vitamins'}**`
+						]}
+						chartData={{
+							labels: historyLabels.slice(-7),
+							data: historyTotalFeedKg.slice(-7),
+							color: 'rgba(34, 197, 94, 0.75)'
+						}}
+					/>
+
+					{/* Efficient Labor Plan */}
+					<ActionPlanCard
+						title="Efficient Labor Plan"
+						icon="👥"
+						details={[
+							`**Monday / Wed / Fri**: Net Cleaning & Shrimp Sampling`,
+							`**Tuesday / Thursday**: Aerator Maintenance`
+						]}
+						laborData={{
+							totalWorkers: sum(labor.map((l) => l.worker_count)),
+							tasksCompleted: sum(labor.map((l) => l.tasks_completed.length)),
+							efficiency: avg(labor.map((l) => l.efficiency_score))
+						}}
+					/>
+
+					{/* Optimal Harvest Plan */}
+					<ActionPlanCard
+						title="Optimal Harvest Plan"
+						icon="📅"
+						details={[
+							`Between **${calculateHarvestWindow(historyAvgWeight)}** (FCR ${typeof fcr === 'number' ? formatNumber(fcr, { maximumFractionDigits: 1 }) : '1.3'})`,
+							`Projected Yield: **${formatNumber(projectedHarvestTons, { maximumFractionDigits: 1 })} tons**`,
+							`Market Price: **$${formatNumber(shrimpPricePerKg, { maximumFractionDigits: 2 })}/kg**`
+						]}
+						harvestChartData={{
+							labels: historyLabels.slice(-7),
+							waterData: historyFiltered.slice(-7).map((h) => ({
+								temp: avg(h.water_quality?.map((w) => w.temperature) || [avgTemp]),
+								do: avg(h.water_quality?.map((w) => w.dissolved_oxygen) || [avgOxygen]),
+								ph: avg(h.water_quality?.map((w) => w.ph) || [avgPh]),
+								salinity: avg(h.water_quality?.map((w) => w.salinity) || [avgSalinity])
+							}))
+						}}
+					/>
+				</div>
+			</div>
 
 			<div className="panel spanAll">
 				<PanelHeader
@@ -863,6 +1012,202 @@ function countAlerts(alerts: Array<{ tone: ChipTone }>) {
 		else if (a.tone === 'info') counts.info += 1
 	}
 	return counts
+}
+
+function calculateHarvestWindow(avgWeightHistory: number[]): string {
+	if (avgWeightHistory.length < 2) {
+		const today = new Date()
+		const harvestDate = new Date(today.getTime() + 20 * 24 * 60 * 60 * 1000)
+		const harvestEndDate = new Date(harvestDate.getTime() + 10 * 24 * 60 * 60 * 1000)
+		const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+		return `${monthNames[harvestDate.getMonth()]} ${harvestDate.getDate()} – ${monthNames[harvestEndDate.getMonth()]} ${harvestEndDate.getDate()}`
+	}
+	
+	const currentWeight = avgWeightHistory[avgWeightHistory.length - 1]
+	const prevWeight = avgWeightHistory[avgWeightHistory.length - 2] || currentWeight
+	const growthRate = Math.max(0.1, currentWeight - prevWeight)
+	
+	// Estimate days to reach harvest size (typically 20-25g)
+	const targetWeight = 22
+	const daysToHarvest = Math.max(10, Math.min(30, Math.round((targetWeight - currentWeight) / growthRate)))
+	
+	const today = new Date()
+	const harvestDate = new Date(today.getTime() + daysToHarvest * 24 * 60 * 60 * 1000)
+	const harvestEndDate = new Date(harvestDate.getTime() + 10 * 24 * 60 * 60 * 1000)
+	
+	const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+	return `${monthNames[harvestDate.getMonth()]} ${harvestDate.getDate()} – ${monthNames[harvestEndDate.getMonth()]} ${harvestEndDate.getDate()}`
+}
+
+type ActionPlanCardProps = {
+	title: string
+	icon: string
+	details: string[]
+	chartData?: { labels: string[]; data: number[]; color: string }
+	laborData?: { totalWorkers: number; tasksCompleted: number; efficiency: number }
+	harvestChartData?: {
+		labels: string[]
+		waterData: Array<{ temp: number; do: number; ph: number; salinity: number }>
+	}
+}
+
+function ActionPlanCard({ title, icon, details, chartData, laborData, harvestChartData }: ActionPlanCardProps) {
+	const [expanded, setExpanded] = useState(true)
+
+	return (
+		<div className="actionPlanCard">
+			<div className="actionPlanHeader" onClick={() => setExpanded(!expanded)}>
+				<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+					<div className="actionPlanIcon">{icon}</div>
+					<h3 className="actionPlanTitle">{title}</h3>
+				</div>
+				<button
+					className="actionPlanToggle"
+					onClick={(e) => {
+						e.stopPropagation()
+						setExpanded(!expanded)
+					}}
+					type="button"
+					aria-label={expanded ? 'Collapse' : 'Expand'}
+				>
+					<span style={{ transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
+						▼
+					</span>
+				</button>
+			</div>
+			{expanded && (
+				<div className="actionPlanContent">
+					<div className="actionPlanDetails">
+						{details.map((detail, i) => {
+							const parts = detail.split(/(\*\*[^*]+\*\*)/g)
+							return (
+								<div key={i} style={{ marginBottom: '8px', lineHeight: '1.6', color: 'rgba(17, 24, 39, 0.85)' }}>
+									{parts.map((part, j) => {
+										if (part.startsWith('**') && part.endsWith('**')) {
+											const text = part.slice(2, -2)
+											return <strong key={j} style={{ color: 'rgba(17, 24, 39, 0.95)' }}>{text}</strong>
+										}
+										return <span key={j}>{part}</span>
+									})}
+								</div>
+							)
+						})}
+					</div>
+					{chartData && (
+						<div className="actionPlanChart">
+							<Bar
+								data={{
+									labels: chartData.labels,
+									datasets: [
+										{
+											label: 'Feed (kg)',
+											data: chartData.data,
+											backgroundColor: chartData.color,
+											borderRadius: 6,
+											maxBarThickness: 20
+										}
+									]
+								}}
+								options={{
+									responsive: true,
+									maintainAspectRatio: false,
+									plugins: { legend: { display: false } },
+									scales: {
+										x: { grid: { display: false }, ticks: { color: 'rgba(17, 24, 39, 0.55)', font: { size: 10 } } },
+										y: { grid: { color: 'rgba(17, 24, 39, 0.08)' }, ticks: { color: 'rgba(17, 24, 39, 0.55)', font: { size: 10 } } }
+									}
+								}}
+							/>
+						</div>
+					)}
+					{laborData && (
+						<div className="actionPlanLabor">
+							<div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+								{[...Array(Math.min(3, Math.ceil(laborData.totalWorkers / 2)))].map((_, i) => (
+									<div key={i} className="laborIcon" style={{ backgroundColor: '#3b82f6' }}>👤</div>
+								))}
+								{[...Array(Math.min(3, Math.ceil(laborData.totalWorkers / 2)))].map((_, i) => (
+									<div key={i + 3} className="laborIcon" style={{ backgroundColor: '#22c55e' }}>👤</div>
+								))}
+								<div className="laborIcon" style={{ backgroundColor: '#94a3b8' }}>📋</div>
+							</div>
+						</div>
+					)}
+					{harvestChartData && (
+						<div className="actionPlanChart">
+							<Bar
+								data={{
+									labels: harvestChartData.labels,
+									datasets: [
+										{
+											label: 'Temp',
+											data: harvestChartData.waterData.map((d) => Math.max(0, (d.temp - 20) * 2)),
+											backgroundColor: 'rgba(239, 68, 68, 0.7)'
+										},
+										{
+											label: 'DO',
+											data: harvestChartData.waterData.map((d) => Math.max(0, (d.do - 4) * 2)),
+											backgroundColor: 'rgba(59, 130, 246, 0.7)'
+										},
+										{
+											label: 'pH',
+											data: harvestChartData.waterData.map((d) => Math.max(0, (d.ph - 7) * 4)),
+											backgroundColor: 'rgba(34, 197, 94, 0.7)'
+										},
+										{
+											label: 'Salinity',
+											data: harvestChartData.waterData.map((d) => Math.max(0, (d.salinity - 10) * 0.5)),
+											backgroundColor: 'rgba(96, 165, 250, 0.7)'
+										}
+									]
+								}}
+								options={{
+									responsive: true,
+									maintainAspectRatio: false,
+									plugins: { 
+										legend: { display: false },
+										tooltip: {
+											callbacks: {
+												label: function(context) {
+													const datasetLabel = context.dataset.label || ''
+													const value = context.parsed.y
+													// Reverse normalization for display
+													let displayValue = value
+													if (datasetLabel === 'Temp') displayValue = (value / 2) + 20
+													else if (datasetLabel === 'DO') displayValue = (value / 2) + 4
+													else if (datasetLabel === 'pH') displayValue = (value / 4) + 7
+													else if (datasetLabel === 'Salinity') displayValue = (value / 0.5) + 10
+													return `${datasetLabel}: ${formatNumber(displayValue, { maximumFractionDigits: 1 })}`
+												}
+											}
+										}
+									},
+									scales: {
+										x: { 
+											grid: { display: false }, 
+											ticks: { color: 'rgba(17, 24, 39, 0.55)', font: { size: 10 } },
+											stacked: true
+										},
+										y: { 
+											grid: { color: 'rgba(17, 24, 39, 0.08)' }, 
+											ticks: { color: 'rgba(17, 24, 39, 0.55)', font: { size: 10 } },
+											stacked: true
+										}
+									}
+								}}
+							/>
+							<div className="chartLegend" style={{ display: 'flex', gap: '12px', marginTop: '8px', justifyContent: 'center' }}>
+								<LegendDot color="#ef4444" label="Temp" />
+								<LegendDot color="#3b82f6" label="DO" />
+								<LegendDot color="#22c55e" label="pH" />
+								<LegendDot color="#60a5fa" label="Salinity" />
+							</div>
+						</div>
+					)}
+				</div>
+			)}
+		</div>
+	)
 }
 
 
