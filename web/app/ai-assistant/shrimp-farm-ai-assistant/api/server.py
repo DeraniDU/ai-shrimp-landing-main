@@ -4,8 +4,6 @@ from typing import Dict, Any, List, Optional, Tuple
 from datetime import datetime
 import time
 import random
-import json
-from pathlib import Path
 
 import numpy as np
 
@@ -15,6 +13,7 @@ from agents.energy_optimization_agent import EnergyOptimizationAgent
 from agents.labor_optimization_agent import LaborOptimizationAgent
 from agents.manager_agent import ManagerAgent
 from agents.decision_recommendation_agent import DecisionRecommendationAgent
+from agents.forecasting_agent import ForecastingAgent
 from config import FARM_CONFIG
 
 app = FastAPI(title="Shrimp Farm Management API", version="0.1.0")
@@ -40,57 +39,139 @@ def health() -> Dict[str, Any]:
 	return {"status": "ok", "time": datetime.utcnow().isoformat()}
 
 
-def _repo_root() -> Path:
-	# api/ lives at repo_root/api/
-	return Path(__file__).resolve().parents[1]
-
+def _load_saved_snapshots_with_time(limit: int, start_time: Optional[datetime] = None) -> List[Dict[str, Any]]:
+	"""
+	Load saved farm snapshots from MongoDB.
+	
+	This function now only uses MongoDB - JSON file fallback has been removed.
+	Data must be saved to MongoDB for historical snapshots to work.
+	"""
+	try:
+		from database.repository import DataRepository
+		from config import USE_MONGODB
+		
+		if not USE_MONGODB:
+			print("[WARN] MongoDB is not enabled. Enable USE_MONGODB in config to use historical data.")
+			return []
+		
+		repository = DataRepository()
+		if not repository.is_available:
+			print("[WARN] MongoDB repository is not available. Check your MongoDB connection.")
+			return []
+		
+		snapshots = repository.get_historical_snapshots(limit=limit, start_time=start_time)
+		if snapshots:
+			print(f"[DB] Loaded {len(snapshots)} historical snapshots from MongoDB")
+			# Add source identifier for consistency
+			return [{"source": "mongodb", **snapshot} for snapshot in snapshots]
+		else:
+			print("[INFO] No historical snapshots found in MongoDB")
+			return []
+			
+	except Exception as e:
+		print(f"[ERROR] Could not load from MongoDB: {e}")
+		import traceback
+		traceback.print_exc()
+		return []
 
 def _load_saved_snapshots(limit: int) -> List[Dict[str, Any]]:
 	"""
-	Load saved farm snapshots from JSON files in the repo root.
-
-	Expected filename patterns:
-	- farm_data_YYYYMMDD_HHMMSS.json
-	- demo_farm_data_YYYYMMDD_HHMMSS.json
+	Load saved farm snapshots (backwards compatibility wrapper).
 	"""
-	root = _repo_root()
-	files = list(root.glob("farm_data_*.json")) + list(root.glob("demo_farm_data_*.json"))
-
-	def file_key(p: Path) -> str:
-		return p.name
-
-	files.sort(key=file_key)
-	if limit > 0:
-		files = files[-limit:]
-
-	out: List[Dict[str, Any]] = []
-	for p in files:
-		try:
-			with p.open("r", encoding="utf-8") as f:
-				data = json.load(f)
-			# Normalize: ensure timestamp exists.
-			if "timestamp" not in data:
-				continue
-			out.append({"source": p.name, **data})
-		except Exception:
-			continue
-
-	# Sort chronologically by embedded timestamp (fallback to source).
-	def ts_key(item: Dict[str, Any]) -> str:
-		return str(item.get("timestamp") or "") + " " + str(item.get("source") or "")
-
-	out.sort(key=ts_key)
-	return out
+	return _load_saved_snapshots_with_time(limit=limit, start_time=None)
 
 
 @app.get("/api/history")
-def get_history(limit: int = 30) -> Dict[str, Any]:
+def get_history(limit: int = 7, days: Optional[int] = None) -> Dict[str, Any]:
 	"""
-	Return historical snapshots from saved JSON files for dashboard charting.
+	Return historical snapshots from MongoDB for dashboard charting.
+	
+	Data must be saved to MongoDB for this endpoint to work. JSON file fallback has been removed.
+	
+	Args:
+		limit: Maximum number of snapshots to return (default: 7 for one week of daily snapshots)
+		days: Optional number of days to look back (uses this to calculate start_time if provided)
 	"""
+	from datetime import timedelta
+	
+	# If days is provided, calculate start_time
+	start_time = None
+	if days is not None:
+		days = max(1, min(int(days), 90))  # Limit to 90 days
+		start_time = datetime.utcnow() - timedelta(days=days)
+		limit = days  # Set limit to match days for daily snapshots
+	
 	limit = max(0, min(int(limit), 500))
-	items = _load_saved_snapshots(limit=limit)
+	
+	# Load from MongoDB only
+	items = _load_saved_snapshots_with_time(limit=limit, start_time=start_time)
 	return {"count": len(items), "items": items}
+
+
+@app.get("/api/forecasts")
+def get_forecasts(
+	ponds: int = FARM_CONFIG.get("pond_count", 4),
+	forecast_days: int = 90,
+	fresh: bool = False,
+	seed: Optional[int] = None,
+) -> Dict[str, Any]:
+	"""
+	Generate AI-powered forecasts for shrimp farm operations.
+	
+	Query params:
+	- ponds: Number of ponds to forecast for
+	- forecast_days: Number of days to forecast (default: 90)
+	- fresh: If true, bypass cache and generate new forecasts
+	- seed: Optional RNG seed for reproducible data
+	"""
+	# Optional deterministic seeding
+	if seed is not None:
+		random.seed(int(seed))
+		np.random.seed(int(seed))
+	
+	# Generate current data
+	water_quality_agent = WaterQualityAgent()
+	feed_agent = FeedPredictionAgent()
+	energy_agent = EnergyOptimizationAgent()
+	labor_agent = LaborOptimizationAgent()
+	
+	water_quality_data = []
+	feed_data = []
+	energy_data = []
+	labor_data = []
+	
+	for pond_id in range(1, ponds + 1):
+		wq = water_quality_agent.get_water_quality_data(pond_id)
+		water_quality_data.append(wq)
+		
+		feed = feed_agent.get_feed_data(pond_id, wq)
+		feed_data.append(feed)
+		
+		energy = energy_agent.get_energy_data(pond_id, wq)
+		energy_data.append(energy)
+		
+		labor = labor_agent.get_labor_data(pond_id, wq, energy)
+		labor_data.append(labor)
+	
+	# Load historical data (from MongoDB or JSON files)
+	historical_snapshots = _load_saved_snapshots(limit=30)
+	
+	# Generate forecasts using AI agent
+	forecasting_agent = ForecastingAgent()
+	forecasts = forecasting_agent.generate_forecasts(
+		water_quality_data=water_quality_data,
+		feed_data=feed_data,
+		energy_data=energy_data,
+		labor_data=labor_data,
+		historical_snapshots=historical_snapshots,
+		forecast_days=forecast_days
+	)
+	
+	return {
+		"forecasts": forecasts,
+		"timestamp": datetime.utcnow().isoformat(),
+		"forecast_days": forecast_days
+	}
 
 
 @app.get("/api/dashboard")
@@ -138,16 +219,16 @@ def get_dashboard(
 	labor_data = []
 
 	for pond_id in range(1, ponds + 1):
-		wq = water_quality_agent.simulate_water_quality_data(pond_id)
+		wq = water_quality_agent.get_water_quality_data(pond_id)
 		water_quality_data.append(wq)
 
-		feed = feed_agent.simulate_feed_data(pond_id, wq)
+		feed = feed_agent.get_feed_data(pond_id, wq)
 		feed_data.append(feed)
 
-		energy = energy_agent.simulate_energy_data(pond_id, wq)
+		energy = energy_agent.get_energy_data(pond_id, wq)
 		energy_data.append(energy)
 
-		labor = labor_agent.simulate_labor_data(pond_id, wq, energy)
+		labor = labor_agent.get_labor_data(pond_id, wq, energy)
 		labor_data.append(labor)
 
 	dashboard = manager_agent.create_dashboard(water_quality_data, feed_data, energy_data, labor_data)

@@ -7,16 +7,24 @@ try:
 except Exception:  # pragma: no cover
     from langchain.chat_models import ChatOpenAI  # type: ignore
 from models import FeedData, WaterQualityData
-from config import OPENAI_API_KEY, OPENAI_MODEL_NAME, OPENAI_TEMPERATURE, FARM_CONFIG
-import random
+from config import OPENAI_API_KEY, OPENAI_MODEL_NAME, OPENAI_TEMPERATURE, FARM_CONFIG, USE_MONGODB
 from datetime import datetime, timedelta
-from typing import List
+from typing import List, Optional
 
 class FeedPredictionAgent:
     def __init__(self):
         # LLM is optional; simulation mode and downstream dashboards should work without an OpenAI key.
         self.llm = None
         self.agent = None
+        self.repository = None
+        
+        # Initialize MongoDB repository if enabled
+        if USE_MONGODB:
+            try:
+                from database.repository import DataRepository
+                self.repository = DataRepository()
+            except Exception as e:
+                print(f"Warning: Could not initialize MongoDB repository: {e}")
 
         if OPENAI_API_KEY:
             self.llm = ChatOpenAI(
@@ -64,47 +72,21 @@ class FeedPredictionAgent:
             expected_output="Comprehensive feed prediction report with amounts, timing, and efficiency recommendations"
         )
     
-    def simulate_feed_data(self, pond_id: int, water_quality_data: WaterQualityData) -> FeedData:
-        """Simulate realistic feed data based on water quality and shrimp parameters"""
-        # Simulate shrimp population and weight
-        shrimp_count = random.randint(8000, 12000)
-        average_weight = random.uniform(8, 15)  # grams
+    def get_feed_data(self, pond_id: int, water_quality_data: Optional[WaterQualityData] = None) -> FeedData:
+        """Get feed data from MongoDB"""
+        if not self.repository or not self.repository.is_available:
+            raise ValueError(f"MongoDB repository not available. Cannot fetch feed data for pond {pond_id}")
         
-        # Calculate biomass
-        biomass = shrimp_count * average_weight / 1000  # kg
-        
-        # Base feed amount (3-5% of biomass per day)
-        base_feed_rate = random.uniform(0.03, 0.05)
-        daily_feed = biomass * base_feed_rate * 1000  # grams
-        
-        # Adjust based on water quality
-        feed_adjustment = self._calculate_feed_adjustment(water_quality_data)
-        adjusted_feed = daily_feed * feed_adjustment
-        
-        # Determine feeding frequency based on temperature
-        if water_quality_data.temperature > 28:
-            feeding_frequency = 4  # More frequent in warm water
-        elif water_quality_data.temperature < 26:
-            feeding_frequency = 2  # Less frequent in cool water
-        else:
-            feeding_frequency = 3  # Standard frequency
-        
-        # Calculate per-feeding amount
-        feed_per_serving = adjusted_feed / feeding_frequency
-        
-        # Predict next feeding (in 6-8 hours)
-        next_feeding = datetime.now() + timedelta(hours=random.uniform(6, 8))
-        
-        return FeedData(
-            timestamp=datetime.now(),
-            pond_id=pond_id,
-            shrimp_count=shrimp_count,
-            average_weight=average_weight,
-            feed_amount=feed_per_serving,
-            feed_type=self._select_feed_type(average_weight),
-            feeding_frequency=feeding_frequency,
-            predicted_next_feeding=next_feeding
-        )
+        try:
+            data = self.repository.get_latest_feed_data(pond_id)
+            if data:
+                print(f"[DB] Fetched feed data for pond {pond_id} from MongoDB")
+                return data
+            else:
+                raise ValueError(f"No feed data found in database for pond {pond_id}")
+        except Exception as e:
+            print(f"Error: Could not fetch from MongoDB: {e}")
+            raise
     
     def _calculate_feed_adjustment(self, water_quality_data: WaterQualityData) -> float:
         """Calculate feed adjustment factor based on water quality"""

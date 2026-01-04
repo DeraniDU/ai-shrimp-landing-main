@@ -7,16 +7,24 @@ try:
 except Exception:  # pragma: no cover
     from langchain.chat_models import ChatOpenAI  # type: ignore
 from models import EnergyData, WaterQualityData
-from config import OPENAI_API_KEY, OPENAI_MODEL_NAME, OPENAI_TEMPERATURE
-import random
+from config import OPENAI_API_KEY, OPENAI_MODEL_NAME, OPENAI_TEMPERATURE, USE_MONGODB
 from datetime import datetime, timedelta
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 class EnergyOptimizationAgent:
     def __init__(self):
         # LLM is optional; simulation mode and downstream dashboards should work without an OpenAI key.
         self.llm = None
         self.agent = None
+        self.repository = None
+        
+        # Initialize MongoDB repository if enabled
+        if USE_MONGODB:
+            try:
+                from database.repository import DataRepository
+                self.repository = DataRepository()
+            except Exception as e:
+                print(f"Warning: Could not initialize MongoDB repository: {e}")
 
         if OPENAI_API_KEY:
             self.llm = ChatOpenAI(
@@ -70,43 +78,21 @@ class EnergyOptimizationAgent:
             expected_output="Detailed energy optimization plan with recommendations, cost savings, and implementation strategy"
         )
     
-    def simulate_energy_data(self, pond_id: int, water_quality_data: WaterQualityData) -> EnergyData:
-        """Simulate realistic energy consumption data"""
-        # Base energy consumption (varies by pond size and equipment)
-        base_aerator = random.uniform(15, 25)  # kWh per day
-        base_pump = random.uniform(8, 15)      # kWh per day
-        base_heater = random.uniform(0, 20)    # kWh per day (seasonal)
+    def get_energy_data(self, pond_id: int, water_quality_data: Optional[WaterQualityData] = None) -> EnergyData:
+        """Get energy data from MongoDB"""
+        if not self.repository or not self.repository.is_available:
+            raise ValueError(f"MongoDB repository not available. Cannot fetch energy data for pond {pond_id}")
         
-        # Adjust based on water quality needs
-        aerator_adjustment = self._calculate_aerator_usage(water_quality_data)
-        pump_adjustment = self._calculate_pump_usage(water_quality_data)
-        heater_adjustment = self._calculate_heater_usage(water_quality_data)
-        
-        aerator_usage = base_aerator * aerator_adjustment
-        pump_usage = base_pump * pump_adjustment
-        heater_usage = base_heater * heater_adjustment
-        
-        total_energy = aerator_usage + pump_usage + heater_usage
-        
-        # Calculate cost (assuming $0.12/kWh average)
-        cost_per_kwh = 0.12
-        cost = total_energy * cost_per_kwh
-        
-        # Calculate efficiency score
-        efficiency_score = self._calculate_efficiency_score(
-            water_quality_data, aerator_usage, pump_usage, heater_usage
-        )
-        
-        return EnergyData(
-            timestamp=datetime.now(),
-            pond_id=pond_id,
-            aerator_usage=aerator_usage,
-            pump_usage=pump_usage,
-            heater_usage=heater_usage,
-            total_energy=total_energy,
-            cost=cost,
-            efficiency_score=efficiency_score
-        )
+        try:
+            data = self.repository.get_latest_energy_data(pond_id)
+            if data:
+                print(f"[DB] Fetched energy data for pond {pond_id} from MongoDB")
+                return data
+            else:
+                raise ValueError(f"No energy data found in database for pond {pond_id}")
+        except Exception as e:
+            print(f"Error: Could not fetch from MongoDB: {e}")
+            raise
     
     def _calculate_aerator_usage(self, water_quality_data: WaterQualityData) -> float:
         """Calculate aerator usage adjustment based on dissolved oxygen"""

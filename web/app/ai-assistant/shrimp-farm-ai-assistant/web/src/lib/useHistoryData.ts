@@ -7,8 +7,8 @@ type State = {
 	error: string | null
 }
 
-export function useHistoryData(params: { limit: number }) {
-	const { limit } = params
+export function useHistoryData(params: { limit?: number; days?: number }) {
+	const { limit, days } = params
 	const [state, setState] = useState<State>({ data: null, loading: false, error: null })
 	const abortRef = useRef<AbortController | null>(null)
 
@@ -19,7 +19,15 @@ export function useHistoryData(params: { limit: number }) {
 
 		setState((s) => ({ ...s, loading: true, error: null }))
 		try {
-			const res = await fetch(`/api/history?limit=${encodeURIComponent(String(limit))}`, { signal: controller.signal })
+			// Build query params - prefer days if provided
+			const queryParams = new URLSearchParams()
+			if (days !== undefined) {
+				queryParams.set('days', String(days))
+			} else if (limit !== undefined) {
+				queryParams.set('limit', String(limit))
+			}
+			
+			const res = await fetch(`/api/history?${queryParams.toString()}`, { signal: controller.signal })
 			if (!res.ok) throw new Error(`API ${res.status}`)
 			const json = (await res.json()) as HistoryApiResponse
 			setState({ data: json, loading: false, error: null })
@@ -28,7 +36,7 @@ export function useHistoryData(params: { limit: number }) {
 			const message = e instanceof Error ? e.message : 'Failed to load'
 			setState((s) => ({ ...s, loading: false, error: message }))
 		}
-	}, [limit])
+	}, [limit, days])
 
 	useEffect(() => {
 		void load()
