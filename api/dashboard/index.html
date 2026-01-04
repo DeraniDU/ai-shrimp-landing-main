@@ -1,18 +1,3 @@
-
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Shrimp Farm — Dasboard</title>
-    <link rel="stylesheet" href="/styles.css" />
-    <!-- Chart.js for in-browser charts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script src="/app.js"></script>
-  </body>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -79,7 +64,7 @@
                 </button>
             </div>
 
-            <!-- Settings Panel -->
+            <!-- Settings Panel (Hidden by default) -->
             <div id="settingsPanel" class="hidden bg-white rounded-lg shadow-md p-6 mb-8">
                 <h2 class="text-2xl font-bold mb-6">⚙️ Configuration Settings</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -121,21 +106,24 @@
                 </button>
             </div>
 
-            <!-- Critical Alerts -->
+            <!-- Critical Alerts Section -->
             <div id="criticalAlerts" class="hidden mb-8">
-                <div class="bg-red-100 border-l-4 border-red-500 rounded-lg shadow-lg p-6">
-                    <div class="flex items-start gap-4">
-                        <div class="text-4xl">🚨</div>
-                        <div class="flex-1">
-                            <h3 class="text-2xl font-bold text-red-800 mb-2">CRITICAL ALERT</h3>
-                            <div id="criticalAlertsList" class="space-y-3"></div>
+                <div class="bg-red-100 border-l-4 border-red-500 rounded-lg shadow-lg">
+                    <div class="p-6">
+                        <div class="flex items-start gap-4">
+                            <div class="text-4xl">🚨</div>
+                            <div class="flex-1">
+                                <h3 class="text-2xl font-bold text-red-800 mb-2">CRITICAL ALERT - IMMEDIATE ACTION REQUIRED</h3>
+                                <div id="criticalAlertsList" class="space-y-3"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Current Status Cards -->
+            <!-- Current Status Cards (Metrics) -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <!-- DO Card -->
                 <div id="doCard" class="metric-card rounded-lg shadow-md p-6 text-white text-center status-good">
                     <div class="text-4xl mb-2">💧</div>
                     <h3 class="text-sm font-semibold opacity-90 mb-2">Dissolved Oxygen</h3>
@@ -144,6 +132,7 @@
                     <p id="doStatus" class="text-sm mt-2 font-semibold">--</p>
                 </div>
 
+                <!-- pH Card -->
                 <div id="phCard" class="metric-card rounded-lg shadow-md p-6 text-white text-center bg-gradient-to-br from-purple-500 to-purple-700">
                     <div class="text-4xl mb-2">🧪</div>
                     <h3 class="text-sm font-semibold opacity-90 mb-2">pH Level</h3>
@@ -152,6 +141,7 @@
                     <p id="phStatus" class="text-sm mt-2 font-semibold">--</p>
                 </div>
 
+                <!-- Temperature Card -->
                 <div id="tempCard" class="metric-card rounded-lg shadow-md p-6 text-white text-center bg-gradient-to-br from-orange-500 to-red-600">
                     <div class="text-4xl mb-2">🌡️</div>
                     <h3 class="text-sm font-semibold opacity-90 mb-2">Temperature</h3>
@@ -160,6 +150,7 @@
                     <p id="tempStatus" class="text-sm mt-2 font-semibold">--</p>
                 </div>
 
+                <!-- Ammonia Card -->
                 <div id="ammoniaCard" class="metric-card rounded-lg shadow-md p-6 text-white text-center bg-gradient-to-br from-pink-500 to-rose-600">
                     <div class="text-4xl mb-2">☠️</div>
                     <h3 class="text-sm font-semibold opacity-90 mb-2">Ammonia</h3>
@@ -169,34 +160,43 @@
                 </div>
             </div>
 
-            <!-- Prediction & Actions -->
+            <!-- Prediction & Recommendations Section -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- ML Prediction -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h2 class="text-2xl font-bold mb-4">🤖 ML Prediction</h2>
                     <div id="predictionContent" class="space-y-4">
-                        <p class="text-gray-600">Waiting for sensor data...</p>
+                        <div class="text-center py-8">
+                            <div class="spinner mx-auto mb-4"></div>
+                            <p class="text-gray-600">Waiting for sensor data...</p>
+                        </div>
                     </div>
                 </div>
 
+                <!-- Action Recommendations -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h2 class="text-2xl font-bold mb-4">📋 Recommended Actions</h2>
                     <div id="actionsContent" class="space-y-3">
-                        <p class="text-gray-600">Waiting for analysis...</p>
+                        <div class="text-center py-8">
+                            <p class="text-gray-600">Waiting for analysis...</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Charts -->
+            <!-- Charts Section -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- DO Trend Chart -->
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-2xl font-bold mb-4">📈 Dissolved Oxygen Trend</h2>
+                    <h2 class="text-2xl font-bold mb-4">📈 Dissolved Oxygen Trend (Last 24 Hours)</h2>
                     <div class="chart-container">
                         <canvas id="doChart"></canvas>
                     </div>
                 </div>
 
+                <!-- pH & Temp Chart -->
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-2xl font-bold mb-4">📊 pH & Temperature</h2>
+                    <h2 class="text-2xl font-bold mb-4">📊 pH & Temperature Trend</h2>
                     <div class="chart-container">
                         <canvas id="phTempChart"></canvas>
                     </div>
@@ -205,15 +205,17 @@
 
             <!-- More Charts -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Ammonia & Nitrite -->
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-2xl font-bold mb-4">⚗️ Ammonia & Nitrite</h2>
+                    <h2 class="text-2xl font-bold mb-4">⚗️ Ammonia & Nitrite Levels</h2>
                     <div class="chart-container">
                         <canvas id="ammoniaNitriteChart"></canvas>
                     </div>
                 </div>
 
+                <!-- Turbidity -->
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-2xl font-bold mb-4">👁️ Turbidity</h2>
+                    <h2 class="text-2xl font-bold mb-4">👁️ Turbidity (Water Clarity)</h2>
                     <div class="chart-container">
                         <canvas id="turbidityChart"></canvas>
                     </div>
@@ -230,7 +232,7 @@
 
             <!-- Data Table -->
             <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-2xl font-bold mb-4">📋 Latest Readings</h2>
+                <h2 class="text-2xl font-bold mb-4">📋 Latest Readings (Last 10)</h2>
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
                         <thead class="bg-gray-100 border-b-2 border-gray-300">
@@ -241,7 +243,7 @@
                                 <th class="px-4 py-2 text-right">Temp</th>
                                 <th class="px-4 py-2 text-right">Ammonia</th>
                                 <th class="px-4 py-2 text-right">Turbidity</th>
-                                <th class="px-4 py-2 text-right">Quality</th>
+                                <th class="px-4 py-2 text-right">Water Quality</th>
                             </tr>
                         </thead>
                         <tbody id="dataTable">
@@ -255,7 +257,7 @@
         <!-- Footer -->
         <footer class="bg-gray-800 text-gray-300 mt-12 py-6">
             <div class="max-w-7xl mx-auto px-4 text-center">
-                <p>🌾 Shrimp Pond IoT Monitoring System</p>
+                <p>🌾 Shrimp Pond IoT Monitoring System | Real-time Water Quality Analysis</p>
                 <p class="text-sm mt-2">Last synced: <span id="syncTime">--:--:--</span></p>
             </div>
         </footer>
@@ -281,22 +283,25 @@
             alerts: [],
             maxDataPoints: 50,
 
+            // Initialize app
             init() {
-                console.log('🚀 Initializing Dashboard');
+                console.log('🚀 Initializing Shrimp Pond Monitor Dashboard');
                 this.loadSettings();
                 this.connectWebSocket();
                 this.fetchHistory();
                 this.initCharts();
-                setInterval(() => this.refreshData(), 30000);
+                setInterval(() => this.refreshData(), 30000); // Refresh every 30s if no WS update
             },
 
+            // Connect to WebSocket
             connectWebSocket() {
-                console.log(`🔗 Connecting to: ${this.wsUrl}`);
+                console.log(`🔗 Connecting to WebSocket: ${this.wsUrl}`);
                 this.ws = new WebSocket(this.wsUrl);
 
                 this.ws.onopen = () => {
                     console.log('✅ WebSocket connected');
-                    document.getElementById('wsIndicator').className = 'ws-indicator ws-connected';
+                    document.getElementById('wsIndicator').classList.remove('ws-disconnected');
+                    document.getElementById('wsIndicator').classList.add('ws-connected');
                     document.getElementById('wsStatus').textContent = '✅ Connected';
                 };
 
@@ -307,22 +312,24 @@
                             this.processReading(msg);
                         }
                     } catch (e) {
-                        console.error('Error:', e);
+                        console.error('Error parsing WebSocket message:', e);
                     }
                 };
 
                 this.ws.onerror = (error) => {
-                    console.error('❌ Error:', error);
+                    console.error('❌ WebSocket error:', error);
                 };
 
                 this.ws.onclose = () => {
-                    console.log('❌ Disconnected');
-                    document.getElementById('wsIndicator').className = 'ws-indicator ws-disconnected';
+                    console.log('❌ WebSocket disconnected');
+                    document.getElementById('wsIndicator').classList.remove('ws-connected');
+                    document.getElementById('wsIndicator').classList.add('ws-disconnected');
                     document.getElementById('wsStatus').textContent = '❌ Disconnected';
                     setTimeout(() => this.connectWebSocket(), 5000);
                 };
             },
 
+            // Process incoming reading
             processReading(msg) {
                 const sensors = msg.sensors;
                 const reading = {
@@ -351,29 +358,37 @@
                 document.getElementById('syncTime').textContent = new Date().toLocaleTimeString();
             },
 
+            // Update metric cards
             updateMetrics(reading) {
+                // DO
                 document.getElementById('doValue').textContent = reading.DO.toFixed(1);
                 const doStatus = reading.DO < this.thresholds.doMinCritical ? '🔴 CRITICAL' :
                                  reading.DO < this.thresholds.doMinWarning ? '🟡 WARNING' : '🟢 GOOD';
                 document.getElementById('doStatus').textContent = doStatus;
                 const doCard = document.getElementById('doCard');
-                doCard.className = 'metric-card rounded-lg shadow-md p-6 text-white text-center ' +
-                    (reading.DO < this.thresholds.doMinCritical ? 'status-critical' :
-                     reading.DO < this.thresholds.doMinWarning ? 'status-warning' : 'status-good');
+                doCard.classList.remove('status-good', 'status-warning', 'status-critical');
+                doCard.classList.add(
+                    reading.DO < this.thresholds.doMinCritical ? 'status-critical' :
+                    reading.DO < this.thresholds.doMinWarning ? 'status-warning' : 'status-good'
+                );
 
+                // pH
                 document.getElementById('phValue').textContent = reading.pH.toFixed(2);
-                const phStatus = (reading.pH < this.thresholds.phMin || reading.pH > this.thresholds.phMax) ? '⚠️ OUT' : '✓ OK';
+                const phStatus = (reading.pH < this.thresholds.phMin || reading.pH > this.thresholds.phMax) ? '⚠️ OUT OF RANGE' : '✓ GOOD';
                 document.getElementById('phStatus').textContent = phStatus;
 
+                // Temperature
                 document.getElementById('tempValue').textContent = reading.Temp.toFixed(1);
-                const tempStatus = (reading.Temp < this.thresholds.tempMin || reading.Temp > this.thresholds.tempMax) ? '⚠️ CHECK' : '✓ OK';
+                const tempStatus = (reading.Temp < this.thresholds.tempMin || reading.Temp > this.thresholds.tempMax) ? '⚠️ CHECK' : '✓ GOOD';
                 document.getElementById('tempStatus').textContent = tempStatus;
 
+                // Ammonia
                 document.getElementById('ammoniaValue').textContent = reading.Ammonia.toFixed(2);
                 const ammStatus = reading.Ammonia > this.thresholds.ammoniaMax ? '⚠️ HIGH' : '✓ OK';
                 document.getElementById('ammoniaStatus').textContent = ammStatus;
             },
 
+            // Check for alerts
             checkAlerts(reading) {
                 const newAlerts = [];
 
@@ -381,13 +396,15 @@
                     newAlerts.push({
                         level: 'CRITICAL',
                         param: 'DO',
-                        message: `⚠️ CRITICAL: DO at ${reading.DO.toFixed(1)} mg/L`,
+                        value: reading.DO.toFixed(1),
+                        message: `⚠️ CRITICAL: DO at ${reading.DO.toFixed(1)} mg/L (threshold: ${this.thresholds.doMinCritical})`,
                         action: '👉 TURN ON AERATOR IMMEDIATELY!'
                     });
                 } else if (reading.DO < this.thresholds.doMinWarning) {
                     newAlerts.push({
                         level: 'WARNING',
                         param: 'DO',
+                        value: reading.DO.toFixed(1),
                         message: `⚠️ WARNING: DO dropping to ${reading.DO.toFixed(1)} mg/L`,
                         action: 'Monitor closely. Consider turning on aerator.'
                     });
@@ -397,8 +414,9 @@
                     newAlerts.push({
                         level: 'WARNING',
                         param: 'Ammonia',
+                        value: reading.Ammonia.toFixed(2),
                         message: `⚠️ High Ammonia: ${reading.Ammonia.toFixed(2)} mg/L`,
-                        action: 'Perform partial water exchange.'
+                        action: 'Perform partial water exchange. Check feeding rate.'
                     });
                 }
 
@@ -406,24 +424,33 @@
                     newAlerts.push({
                         level: 'WARNING',
                         param: 'pH',
+                        value: reading.pH.toFixed(2),
                         message: `⚠️ pH out of range: ${reading.pH.toFixed(2)}`,
-                        action: 'Investigate pH cause.'
+                        action: 'Investigate pH cause. May need lime or aeration adjustment.'
                     });
                 }
 
+                // Add new alerts
                 newAlerts.forEach(alert => {
-                    alert.ts = new Date().toLocaleTimeString();
-                    this.alerts.unshift(alert);
+                    if (!this.alerts.some(a => a.param === alert.param && a.ts === new Date().toLocaleTimeString())) {
+                        alert.ts = new Date().toLocaleTimeString();
+                        this.alerts.unshift(alert);
+                    }
                 });
 
+                // Keep only last 20
                 this.alerts = this.alerts.slice(0, 20);
 
+                // Update UI
                 const criticalAlerts = newAlerts.filter(a => a.level === 'CRITICAL');
                 const criticalDiv = document.getElementById('criticalAlerts');
                 if (criticalAlerts.length > 0) {
                     criticalDiv.classList.remove('hidden');
                     document.getElementById('criticalAlertsList').innerHTML = criticalAlerts
-                        .map(a => `<div class="bg-red-50 p-4 rounded"><p class="font-bold">${a.message}</p><p class="font-bold text-lg">${a.action}</p></div>`)
+                        .map(a => `<div class="bg-red-50 p-4 rounded border-l-4 border-red-600">
+                            <p class="font-bold text-red-900">${a.message}</p>
+                            <p class="text-lg font-bold text-red-700 mt-2">${a.action}</p>
+                        </div>`)
                         .join('');
                 } else {
                     criticalDiv.classList.add('hidden');
@@ -432,106 +459,214 @@
                 this.updateAlertHistory();
             },
 
+            // Update alert history
             updateAlertHistory() {
                 const alertDiv = document.getElementById('alertHistory');
                 if (this.alerts.length === 0) {
-                    alertDiv.innerHTML = '<p class="text-gray-600 text-center py-8">✅ No alerts!</p>';
+                    alertDiv.innerHTML = '<p class="text-gray-600 text-center py-8">✅ No alerts. All systems normal!</p>';
                 } else {
                     alertDiv.innerHTML = this.alerts
-                        .map(a => `<div class="p-4 rounded border-l-4 ${a.level === 'CRITICAL' ? 'bg-red-50 border-red-500' : 'bg-yellow-50 border-yellow-500'}">
-                            <p class="font-bold">${a.message}</p>
-                            <p class="text-sm">${a.action}</p>
+                        .map(a => `<div class="alert-badge p-4 rounded border-l-4 ${
+                            a.level === 'CRITICAL' ? 'bg-red-50 border-red-500' : 'bg-yellow-50 border-yellow-500'
+                        }">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="font-bold ${a.level === 'CRITICAL' ? 'text-red-900' : 'text-yellow-900'}">${a.message}</p>
+                                    <p class="text-sm text-gray-600 mt-1">${a.action}</p>
+                                </div>
+                                <span class="text-xs text-gray-500">${a.ts}</span>
+                            </div>
                         </div>`)
                         .join('');
                 }
             },
 
+            // Update predictions
             updatePredictions(reading) {
                 const predDiv = document.getElementById('predictionContent');
-                let html = '';
-                
                 if (reading.rf && Object.keys(reading.rf).length > 0) {
                     const rf = reading.rf;
-                    html += `<div class="bg-blue-50 p-4 rounded border-l-4 border-blue-500">
-                        <h3 class="font-bold mb-3">Water Quality Forecast</h3>
-                        <div class="space-y-2 text-sm">
-                            <div class="flex justify-between"><span>🌊 Predicted DO:</span><strong>${(rf['DO(mg/L)'] || 0).toFixed(2)} mg/L</strong></div>
-                            <div class="flex justify-between"><span>🧪 Predicted pH:</span><strong>${(rf['pH'] || 0).toFixed(2)}</strong></div>
-                            <div class="flex justify-between"><span>☠️ Predicted Ammonia:</span><strong>${(rf['Ammonia (mg L-1 )'] || 0).toFixed(3)} mg/L</strong></div>
+                    predDiv.innerHTML = `
+                        <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                            <h3 class="font-bold text-blue-900 mb-3">Water Quality Predictions (30-min forecast)</h3>
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span>🌊 Predicted DO:</span>
+                                    <strong class="text-lg">${(rf['DO(mg/L)'] || 0).toFixed(2)} mg/L</strong>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>🧪 Predicted pH:</span>
+                                    <strong class="text-lg">${(rf['pH'] || 0).toFixed(2)}</strong>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>☠️ Predicted Ammonia:</span>
+                                    <strong class="text-lg">${(rf['Ammonia (mg L-1 )'] || 0).toFixed(3)} mg/L</strong>
+                                </div>
+                            </div>
+                            ${rf['note'] ? `<p class="text-sm text-blue-700 mt-3 italic">📌 ${rf['note']}</p>` : ''}
                         </div>
-                    </div>`;
+                    `;
                 }
 
+                // Water quality classification
                 if (reading.svm && reading.svm.class !== undefined) {
+                    const svm = reading.svm;
                     const classNames = {0: '🟢 GOOD', 1: '🟡 MODERATE', 2: '🔴 POOR'};
-                    html += `<div class="bg-green-50 p-4 rounded border-l-4 border-green-500 mt-3">
-                        <h3 class="font-bold mb-2">Water Quality</h3>
-                        <p class="text-2xl font-bold text-green-700">${classNames[reading.svm.class] || 'UNKNOWN'}</p>
-                    </div>`;
+                    const classProb = svm.probabilities ? Math.max(...svm.probabilities) * 100 : 0;
+                    predDiv.innerHTML += `
+                        <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-500 mt-3">
+                            <h3 class="font-bold text-green-900 mb-2">Water Quality Classification</h3>
+                            <p class="text-2xl font-bold text-green-700">${classNames[svm.class] || 'UNKNOWN'}</p>
+                            ${classProb > 0 ? `<p class="text-sm text-gray-600 mt-2">Confidence: ${classProb.toFixed(1)}%</p>` : ''}
+                        </div>
+                    `;
+                }
+            },
+
+            // Generate action recommendations
+            generateActions(reading) {
+                const actions = [];
+
+                if (reading.DO < this.thresholds.doMinCritical) {
+                    actions.push({
+                        priority: 'CRITICAL',
+                        icon: '🔴',
+                        title: 'Aeration Emergency',
+                        desc: 'Turn on aerator immediately to increase dissolved oxygen'
+                    });
+                }
+                if (reading.Ammonia > this.thresholds.ammoniaMax) {
+                    actions.push({
+                        priority: 'HIGH',
+                        icon: '🟡',
+                        title: 'Partial Water Exchange',
+                        desc: `Replace 30-50% of pond water. Ammonia at ${reading.Ammonia.toFixed(2)} mg/L`
+                    });
+                }
+                if (reading.pH < this.thresholds.phMin) {
+                    actions.push({
+                        priority: 'MEDIUM',
+                        icon: '🟢',
+                        title: 'pH Adjustment',
+                        desc: `Add lime/calcium carbonate. pH at ${reading.pH.toFixed(2)}`
+                    });
+                }
+                if (reading.pH > this.thresholds.phMax) {
+                    actions.push({
+                        priority: 'MEDIUM',
+                        icon: '🟢',
+                        title: 'pH Reduction',
+                        desc: `Increase water exchange or add acid. pH at ${reading.pH.toFixed(2)}`
+                    });
+                }
+                if (reading.Temp < this.thresholds.tempMin || reading.Temp > this.thresholds.tempMax) {
+                    actions.push({
+                        priority: 'LOW',
+                        icon: '🔵',
+                        title: 'Temperature Check',
+                        desc: `Monitor temperature. Current: ${reading.Temp.toFixed(1)}°C`
+                    });
+                }
+                if (reading.Turbidity < this.thresholds.turbidityMin) {
+                    actions.push({
+                        priority: 'LOW',
+                        icon: '🔵',
+                        title: 'Water Clarity Low',
+                        desc: `Check water transparency. Visibility: ${reading.Turbidity.toFixed(0)} cm`
+                    });
                 }
 
-                predDiv.innerHTML = html || '<p class="text-gray-600">Waiting...</p>';
+                return actions.length === 0 ? [{
+                    priority: 'NONE',
+                    icon: '✅',
+                    title: 'All Parameters Good',
+                    desc: 'Continue monitoring. No immediate action needed.'
+                }] : actions;
+            },
 
-                // Actions
+            // Update UI with actions
+            updatePredictions(reading) {
+                // ... existing prediction code ...
                 const actions = this.generateActions(reading);
                 const actionDiv = document.getElementById('actionsContent');
                 actionDiv.innerHTML = actions.map(a => {
-                    const bgColor = a.priority === 'CRITICAL' ? 'bg-red-50 border-red-500' : 'bg-yellow-50 border-yellow-500';
+                    const bgColor = a.priority === 'CRITICAL' ? 'bg-red-50 border-red-500' :
+                                   a.priority === 'HIGH' ? 'bg-orange-50 border-orange-500' :
+                                   a.priority === 'MEDIUM' ? 'bg-yellow-50 border-yellow-500' :
+                                   a.priority === 'NONE' ? 'bg-green-50 border-green-500' : 'bg-blue-50 border-blue-500';
                     return `<div class="p-4 rounded border-l-4 ${bgColor}">
-                        <p class="font-bold">${a.icon} ${a.title}</p>
+                        <p class="font-bold text-lg">${a.icon} ${a.title}</p>
                         <p class="text-sm text-gray-700 mt-1">${a.desc}</p>
                     </div>`;
                 }).join('');
             },
 
-            generateActions(reading) {
-                const actions = [];
-                if (reading.DO < this.thresholds.doMinCritical) {
-                    actions.push({priority: 'CRITICAL', icon: '🔴', title: 'Aeration', desc: 'Turn on aerator NOW'});
-                }
-                if (reading.Ammonia > this.thresholds.ammoniaMax) {
-                    actions.push({priority: 'HIGH', icon: '🟡', title: 'Water Exchange', desc: 'Replace 30-50% of water'});
-                }
-                if (reading.pH < this.thresholds.phMin || reading.pH > this.thresholds.phMax) {
-                    actions.push({priority: 'MEDIUM', icon: '🟢', title: 'pH Adjustment', desc: 'Check pH cause'});
-                }
-                return actions.length === 0 ? [{priority: 'NONE', icon: '✅', title: 'All Good', desc: 'Continue monitoring'}] : actions;
-            },
-
+            // Initialize charts
             initCharts() {
                 const ctx1 = document.getElementById('doChart').getContext('2d');
                 this.charts.do = new Chart(ctx1, {
                     type: 'line',
-                    data: {labels: [], datasets: [{label: 'DO (mg/L)', data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 2, fill: true, tension: 0.3}]},
-                    options: {responsive: true, maintainAspectRatio: false, scales: {y: {min: 0, max: 12}}}
+                    data: {labels: [], datasets: [{
+                        label: 'DO (mg/L)',
+                        data: [],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3
+                    }]},
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {legend: {display: true}},
+                        scales: {y: {min: 0, max: 12}}
+                    }
                 });
 
                 const ctx2 = document.getElementById('phTempChart').getContext('2d');
                 this.charts.phTemp = new Chart(ctx2, {
                     type: 'line',
-                    data: {labels: [], datasets: [{label: 'pH', data: [], borderColor: '#a855f7', yAxisID: 'y'}, {label: 'Temp (°C)', data: [], borderColor: '#f97316', yAxisID: 'y1'}]},
-                    options: {responsive: true, maintainAspectRatio: false, scales: {y: {position: 'left'}, y1: {position: 'right'}}}
+                    data: {labels: [], datasets: [
+                        {label: 'pH', data: [], borderColor: '#a855f7', yAxisID: 'y'},
+                        {label: 'Temp (°C)', data: [], borderColor: '#f97316', yAxisID: 'y1'}
+                    ]},
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {y: {position: 'left'}, y1: {position: 'right'}}
+                    }
                 });
 
                 const ctx3 = document.getElementById('ammoniaNitriteChart').getContext('2d');
                 this.charts.ammonia = new Chart(ctx3, {
                     type: 'line',
-                    data: {labels: [], datasets: [{label: 'Ammonia (mg/L)', data: [], borderColor: '#ef4444'}, {label: 'Nitrite (mg/L)', data: [], borderColor: '#f59e0b'}]},
+                    data: {labels: [], datasets: [
+                        {label: 'Ammonia (mg/L)', data: [], borderColor: '#ef4444'},
+                        {label: 'Nitrite (mg/L)', data: [], borderColor: '#f59e0b'}
+                    ]},
                     options: {responsive: true, maintainAspectRatio: false}
                 });
 
                 const ctx4 = document.getElementById('turbidityChart').getContext('2d');
                 this.charts.turbidity = new Chart(ctx4, {
                     type: 'line',
-                    data: {labels: [], datasets: [{label: 'Turbidity (cm)', data: [], borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true}]},
+                    data: {labels: [], datasets: [{
+                        label: 'Turbidity (cm)',
+                        data: [],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true
+                    }]},
                     options: {responsive: true, maintainAspectRatio: false}
                 });
             },
 
+            // Update charts
             updateCharts() {
                 if (this.data.length === 0) return;
+
                 const labels = this.data.map(d => d.ts.toLocaleTimeString());
-                
+
                 this.charts.do.data.labels = labels;
                 this.charts.do.data.datasets[0].data = this.data.map(d => d.DO);
                 this.charts.do.update();
@@ -551,41 +686,49 @@
                 this.charts.turbidity.update();
             },
 
+            // Update data table
             updateTable() {
                 const tbody = document.getElementById('dataTable');
                 const rows = this.data.slice().reverse().slice(0, 10);
-                tbody.innerHTML = rows.map(d => `<tr class="border-b hover:bg-gray-50">
-                    <td class="px-4 py-2">${d.ts.toLocaleTimeString()}</td>
-                    <td class="px-4 py-2 text-right">${d.DO.toFixed(2)}</td>
-                    <td class="px-4 py-2 text-right">${d.pH.toFixed(2)}</td>
-                    <td class="px-4 py-2 text-right">${d.Temp.toFixed(1)}</td>
-                    <td class="px-4 py-2 text-right">${d.Ammonia.toFixed(3)}</td>
-                    <td class="px-4 py-2 text-right">${d.Turbidity.toFixed(0)}</td>
-                    <td class="px-4 py-2 text-right font-semibold">${d.svm?.label || '--'}</td>
-                </tr>`).join('');
+                tbody.innerHTML = rows.map(d => `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-4 py-2">${d.ts.toLocaleTimeString()}</td>
+                        <td class="px-4 py-2 text-right">${d.DO.toFixed(2)}</td>
+                        <td class="px-4 py-2 text-right">${d.pH.toFixed(2)}</td>
+                        <td class="px-4 py-2 text-right">${d.Temp.toFixed(1)}</td>
+                        <td class="px-4 py-2 text-right">${d.Ammonia.toFixed(3)}</td>
+                        <td class="px-4 py-2 text-right">${d.Turbidity.toFixed(0)}</td>
+                        <td class="px-4 py-2 text-right font-semibold">${d.svm?.label || '--'}</td>
+                    </tr>
+                `).join('');
             },
 
+            // Fetch history on load
             fetchHistory() {
                 axios.get(`${this.apiUrl}/dashboard/history?limit=50`)
                     .then(res => {
                         res.data.forEach(item => this.processReading(item));
                     })
-                    .catch(e => console.error('Error:', e));
+                    .catch(e => console.error('Error fetching history:', e));
             },
 
+            // Refresh data manually
             refreshData() {
-                console.log('🔄 Refreshing');
+                console.log('🔄 Refreshing data...');
                 this.fetchHistory();
             },
 
+            // Download history
             downloadHistory() {
                 window.location.href = `${this.apiUrl}/dashboard/history.csv`;
             },
 
+            // Toggle settings
             toggleSettings() {
                 document.getElementById('settingsPanel').classList.toggle('hidden');
             },
 
+            // Load settings from localStorage
             loadSettings() {
                 const saved = localStorage.getItem('dashboardThresholds');
                 if (saved) {
@@ -594,6 +737,7 @@
                 this.displaySettings();
             },
 
+            // Display settings in form
             displaySettings() {
                 Object.keys(this.thresholds).forEach(key => {
                     const elem = document.getElementById(key);
@@ -601,6 +745,7 @@
                 });
             },
 
+            // Save settings
             saveSettings() {
                 Object.keys(this.thresholds).forEach(key => {
                     const elem = document.getElementById(key);
@@ -611,6 +756,7 @@
                 document.getElementById('settingsPanel').classList.add('hidden');
             },
 
+            // Clear alerts
             clearAlerts() {
                 this.alerts = [];
                 this.updateAlertHistory();
@@ -618,8 +764,8 @@
             }
         };
 
+        // Start app when page loads
         window.addEventListener('load', () => app.init());
     </script>
 </body>
 </html>
-

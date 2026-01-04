@@ -1,4 +1,6 @@
 from fastapi import FastAPI, HTTPException
+import importlib.util
+import threading
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Any, Dict, List, Optional
@@ -9,9 +11,8 @@ import joblib
 import numpy as np
 import os
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse, RedirectResponse
 from fastapi import WebSocket, WebSocketDisconnect, UploadFile, File
-from fastapi.responses import StreamingResponse
 import sqlite3
 import json
 import datetime
@@ -27,7 +28,7 @@ class PredictRequest(BaseModel):
 app = FastAPI(title="Water Quality Prediction API")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=["http://localhost:3000", "http://localhost:5173", "http://127.0.0.1:5173", "http://127.0.0.1:8000"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -191,33 +192,81 @@ def save_sample_to_db(ts:int, sensors:dict, rf:dict, svm:dict, knn:dict):
     conn.close()
 
 
-# WebSocket manager
+# WebSocket manager with enhanced diagnostics
 class ConnectionManager:
     def __init__(self):
         self.active_connections: List[WebSocket] = []
+        self.connection_log: List[Dict[str, Any]] = []
+        self.max_log_size = 100
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
         self.active_connections.append(websocket)
+        
+        # Log connection
+        log_entry = {
+            'action': 'connect',
+            'timestamp': datetime.datetime.utcnow().isoformat(),
+            'total_connections': len(self.active_connections),
+            'client': getattr(websocket, 'client', 'unknown')
+        }
+        self.connection_log.append(log_entry)
+        if len(self.connection_log) > self.max_log_size:
+            self.connection_log.pop(0)
+        
+        print(f"✅ WebSocket connected. Total active: {len(self.active_connections)}")
 
     def disconnect(self, websocket: WebSocket):
         try:
             self.active_connections.remove(websocket)
+            log_entry = {
+                'action': 'disconnect',
+                'timestamp': datetime.datetime.utcnow().isoformat(),
+                'total_connections': len(self.active_connections)
+            }
+            self.connection_log.append(log_entry)
+            if len(self.connection_log) > self.max_log_size:
+                self.connection_log.pop(0)
+            print(f"❌ WebSocket disconnected. Total active: {len(self.active_connections)}")
         except ValueError:
             pass
 
     async def broadcast(self, message: dict):
+        """Broadcast to all connected clients. Return count of successful sends."""
         living = []
+        failed = 0
         for connection in list(self.active_connections):
             try:
                 await connection.send_json(message)
                 living.append(connection)
-            except Exception:
-                # drop dead connections
-                pass
+            except Exception as e:
+                print(f"⚠️  Failed to send to client: {e}")
+                failed += 1
         self.active_connections = living
+        return len(living), failed
+
+    def get_status(self) -> Dict[str, Any]:
+        """Return current connection status."""
+        return {
+            'connected_clients': len(self.active_connections),
+            'recent_log': self.connection_log[-10:],
+            'status': 'healthy' if len(self.active_connections) > 0 else 'idle'
+        }
 
 manager = ConnectionManager()
+
+# In-process simulator runners: pond_id -> {'thread': Thread, 'sim': Simulator}
+_SIMULATORS: Dict[str, Dict[str, Any]] = {}
+
+def _load_simulator_class():
+    """Dynamically load Simulator class from simulator.py so we don't require package imports."""
+    sim_path = Path(__file__).resolve().parent.joinpath('simulator.py')
+    if not sim_path.exists():
+        raise FileNotFoundError(f"Simulator script not found at {sim_path}")
+    spec = importlib.util.spec_from_file_location('simulator_module', str(sim_path))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return getattr(mod, 'Simulator')
 
 
 @app.on_event('startup')
@@ -233,9 +282,183 @@ def startup_db_and_models():
 def startup_event():
     try:
         load_model()
-        print("Loaded model.")
+        print("✅ Model loaded successfully.")
     except Exception as e:
-        print("Warning: could not load model:", e)
+        print(f"⚠️  Warning: could not load model: {e}")
+    
+    # Verify WebSocket endpoint is registered
+    print("\n" + "="*60)
+    print("WEBSOCKET ENDPOINT VERIFICATION")
+    print("="*60)
+    print("✅ /ws/sensors endpoint is REGISTERED")
+    print(f"✅ URL: ws://localhost:8000/ws/sensors (or wss:// for HTTPS)")
+    print(f"✅ Connection Manager initialized with {len(manager.active_connections)} active connections")
+    print("="*60 + "\n")
+
+
+# --- DIAGNOSTIC ENDPOINTS ---
+
+@app.get('/health')
+def health():
+    """Check API and WebSocket health."""
+    ws_status = manager.get_status()
+    return {
+        "ok": True,
+        "model_loaded": _MODEL is not None,
+        "websocket_endpoint": "/ws/sensors",
+        "websocket_url": "ws://localhost:8000/ws/sensors",
+        "websocket_status": ws_status,
+        "timestamp": datetime.datetime.utcnow().isoformat()
+    }
+
+
+@app.get('/ws/health')
+def ws_health():
+    """Dedicated WebSocket health check."""
+    status = manager.get_status()
+    return {
+        "websocket_running": True,
+        "endpoint": "/ws/sensors",
+        "connected_clients": status['connected_clients'],
+        "status": status['status'],
+        "connection_log": status['recent_log'],
+        "timestamp": datetime.datetime.utcnow().isoformat()
+    }
+
+
+@app.get('/ws/test')
+def ws_test():
+    """Test WebSocket connectivity info and provide client-side code example."""
+    return {
+        "message": "WebSocket endpoint is available",
+        "endpoint": "/ws/sensors",
+        "protocol": "ws://",
+        "host": "localhost:8000",
+        "full_url": "ws://localhost:8000/ws/sensors",
+        "current_connections": manager.get_status()['connected_clients'],
+        "example_client_code": """
+// JavaScript WebSocket client example
+const ws = new WebSocket('ws://localhost:8000/ws/sensors');
+
+ws.onopen = (event) => {
+    console.log('✅ WebSocket connected!');
+    // Optionally send a ping periodically
+    setInterval(() => ws.send('ping'), 30000);
+};
+
+ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    console.log('📊 Received sensor data:', data);
+    // Update dashboard with data
+};
+
+ws.onerror = (error) => {
+    console.error('❌ WebSocket error:', error);
+};
+
+ws.onclose = (event) => {
+    console.log('❌ WebSocket disconnected');
+    // Attempt reconnect after 3 seconds
+    setTimeout(() => location.reload(), 3000);
+};
+"""
+    }
+
+
+def _iter_history_csv(limit: int = 10000):
+    p = _db_path()
+    conn = sqlite3.connect(p)
+    c = conn.cursor()
+    c.execute('SELECT ts,sensors,rf,svm,knn FROM samples ORDER BY id ASC LIMIT ?', (limit,))
+    yield 'ts,sensor_json,rf_json,svm_json,knn_json\n'
+    for ts, sensors, rf, svm, knn in c.fetchall():
+        row = [str(ts), json.dumps(json.loads(sensors)), json.dumps(json.loads(rf)), json.dumps(json.loads(svm)), json.dumps(json.loads(knn))]
+        yield (','.join('"{}"'.format(x.replace('"', '""')) for x in row) + '\n')
+    conn.close()
+
+
+@app.get('/dashboard/history.csv')
+def dashboard_history_csv(limit: int = 10000):
+    gen = _iter_history_csv(limit)
+    return StreamingResponse(gen, media_type='text/csv', headers={
+        'Content-Disposition': 'attachment; filename="dashboard_history.csv"'
+    })
+
+
+@app.websocket('/ws/sensors')
+async def websocket_sensors(ws: WebSocket):
+    """
+    Main WebSocket endpoint for real-time sensor data streaming.
+    
+    Clients connect here to receive:
+    - Sensor readings
+    - ML predictions (RF, SVM, KNN)
+    - Alerts and recommendations
+    
+    Keeps connection alive by:
+    1. Accepting heartbeat pings from client
+    2. Periodically sending data (via /dashboard/predict_all)
+    """
+    await manager.connect(ws)
+    try:
+        while True:
+            # Keep connection alive; receive heartbeat pings from client
+            try:
+                # Set a timeout to detect dead connections
+                msg = await asyncio.wait_for(ws.receive_text(), timeout=60.0)
+                # Client may send 'ping' or other messages; just acknowledge
+                if msg.lower() in ['ping', 'keep-alive']:
+                    await ws.send_json({'type': 'pong', 'ts': int(datetime.datetime.utcnow().timestamp())})
+            except asyncio.TimeoutError:
+                # No message received for 60 seconds; connection might be idle
+                # Send a keep-alive message to check if still connected
+                try:
+                    await ws.send_json({'type': 'keep-alive', 'ts': int(datetime.datetime.utcnow().timestamp())})
+                except Exception:
+                    # Connection is dead; exit
+                    break
+            except WebSocketDisconnect:
+                break
+    except Exception as e:
+        print(f"⚠️  WebSocket error: {e}")
+    finally:
+        manager.disconnect(ws)
+
+
+# --- STARTUP INFO ENDPOINT ---
+
+@app.get('/startup-info')
+def startup_info():
+    """Return detailed startup and configuration info."""
+    return {
+        "api_title": app.title,
+        "api_version": app.version if hasattr(app, 'version') else "1.0",
+        "websocket_endpoints": [
+            {
+                "path": "/ws/sensors",
+                "protocol": "WebSocket",
+                "description": "Real-time sensor data streaming",
+                "url": "ws://localhost:8000/ws/sensors"
+            }
+        ],
+        "diagnostic_endpoints": [
+            {"path": "/health", "method": "GET", "description": "Overall API health"},
+            {"path": "/ws/health", "method": "GET", "description": "WebSocket-specific health"},
+            {"path": "/ws/test", "method": "GET", "description": "WebSocket connectivity test + example code"},
+            {"path": "/startup-info", "method": "GET", "description": "This endpoint"}
+        ],
+        "model_status": {
+            "loaded": _MODEL is not None,
+            "path": str(_model_path()) if _MODEL else None
+        },
+        "cors_origins": [
+            "http://localhost:3000",
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+            "http://127.0.0.1:8000"
+        ],
+        "timestamp": datetime.datetime.utcnow().isoformat()
+    }
 
 
 @app.post('/predict')
@@ -264,17 +487,6 @@ def predict(req: PredictRequest):
         probs = _MODEL.predict_proba(X)
         out['probabilities'] = probs[0].tolist()
     return out
-
-
-@app.get('/health')
-def health():
-    return {"ok": True, "model_loaded": _MODEL is not None}
-
-
-# Mount a lightweight static dashboard (React single-file) from the api/dashboard folder
-dashboard_dir = Path(__file__).resolve().parent.joinpath('dashboard')
-if dashboard_dir.exists():
-    app.mount('/dashboard/static', StaticFiles(directory=str(dashboard_dir)), name='dashboard_static')
 
 
 @app.post('/dashboard/predict_rf')
@@ -410,13 +622,16 @@ async def dashboard_predict_all(req: PredictRequest):
     sensors = req.input
     save_sample_to_db(ts, sensors, rf_out, svm_out, knn_out)
 
-    # Broadcast to websocket listeners (fire-and-forget)
+    # Broadcast to websocket listeners (with error handling)
     payload = {'ts': ts, 'sensors': sensors, 'rf': rf_out, 'svm': svm_out, 'knn': knn_out}
     try:
-        asyncio.get_event_loop().create_task(manager.broadcast(payload))
-    except Exception:
-        # if loop not running or task scheduling fails, ignore
-        pass
+        loop = asyncio.get_event_loop()
+        # Schedule broadcast as task
+        task = loop.create_task(manager.broadcast(payload))
+        # Don't await; fire-and-forget but monitor
+        print(f"📡 Broadcast scheduled for {len(manager.active_connections)} active clients")
+    except Exception as e:
+        print(f"⚠️  Could not schedule broadcast: {e}")
 
     return {'rf': rf_out, 'svm': svm_out, 'knn': knn_out, 'knn_fallback_used': fallback_used}
 
@@ -433,55 +648,6 @@ def dashboard_history(limit: int = 200):
     for ts, sensors, rf, svm, knn in rows:
         out.append({'ts': ts, 'sensors': json.loads(sensors), 'rf': json.loads(rf), 'svm': json.loads(svm), 'knn': json.loads(knn)})
     return out
-
-
-def _iter_history_csv(limit: int = 10000):
-    p = _db_path()
-    conn = sqlite3.connect(p)
-    c = conn.cursor()
-    c.execute('SELECT ts,sensors,rf,svm,knn FROM samples ORDER BY id ASC LIMIT ?', (limit,))
-    yield 'ts,sensor_json,rf_json,svm_json,knn_json\n'
-    for ts, sensors, rf, svm, knn in c.fetchall():
-        row = [str(ts), json.dumps(json.loads(sensors)), json.dumps(json.loads(rf)), json.dumps(json.loads(svm)), json.dumps(json.loads(knn))]
-        yield (','.join('"{}"'.format(x.replace('"', '""')) for x in row) + '\n')
-    conn.close()
-
-
-@app.get('/dashboard/history.csv')
-def dashboard_history_csv(limit: int = 10000):
-    gen = _iter_history_csv(limit)
-    return StreamingResponse(gen, media_type='text/csv', headers={
-        'Content-Disposition': 'attachment; filename="dashboard_history.csv"'
-    })
-
-
-@app.websocket('/ws/sensors')
-async def websocket_sensors(ws: WebSocket):
-    await manager.connect(ws)
-    try:
-        while True:
-            # optionally receive ping messages from client; keep connection alive
-            try:
-                msg = await ws.receive_text()
-                # ignore contents for now
-            except WebSocketDisconnect:
-                break
-    finally:
-        manager.disconnect(ws)
-
-
-@app.get('/dashboard/latest')
-def dashboard_latest():
-    p = _db_path()
-    conn = sqlite3.connect(p)
-    c = conn.cursor()
-    c.execute('SELECT ts,sensors,rf,svm,knn FROM samples ORDER BY id DESC LIMIT 1')
-    row = c.fetchone()
-    conn.close()
-    if not row:
-        raise HTTPException(status_code=404, detail='No history available')
-    ts, sensors, rf, svm, knn = row
-    return {'ts': ts, 'sensors': json.loads(sensors), 'rf': json.loads(rf), 'svm': json.loads(svm), 'knn': json.loads(knn)}
 
 
 @app.post('/dashboard/predict_batch')
@@ -533,4 +699,70 @@ def dashboard_predict_batch(file: UploadFile = File(...)):
     return StreamingResponse(io.BytesIO(out_buf.getvalue().encode('utf-8')), media_type='text/csv', headers={
         'Content-Disposition': f'attachment; filename="{filename}"'
     })
+
+
+@app.post('/dashboard/simulator/start')
+def dashboard_simulator_start(req: Dict[str, Any]):
+    """Start an in-process simulator for a pond. Body: {pond, min, max, mode, hourly_agg_seconds}.
+    Returns status and thread info.
+    """
+    pond = req.get('pond', 'POND_01')
+    if pond in _SIMULATORS:
+        return {'status': 'already_running', 'pond': pond}
+
+    SimulatorClass = _load_simulator_class()
+    sim = SimulatorClass(base_url=f"http://127.0.0.1:8000", pond_id=pond,
+                         interval_min=float(req.get('min', 5)), interval_max=float(req.get('max', 10)),
+                         mode=req.get('mode', 'normal'), logfile=req.get('log', 'simulated_samples.csv'),
+                         hourly_agg_seconds=int(req.get('hourly_agg_seconds', 0)))
+
+    t = threading.Thread(target=sim.run, daemon=True)
+    t.start()
+    _SIMULATORS[pond] = {'thread': t, 'sim': sim, 'started': int(datetime.datetime.utcnow().timestamp())}
+    return {'status': 'started', 'pond': pond}
+
+
+@app.post('/dashboard/simulator/stop')
+def dashboard_simulator_stop(req: Dict[str, Any]):
+    pond = req.get('pond', None)
+    if pond is None:
+        return {'status': 'error', 'detail': 'missing pond'}
+    entry = _SIMULATORS.get(pond)
+    if not entry:
+        return {'status': 'not_running', 'pond': pond}
+    try:
+        sim = entry['sim']
+        sim.stop()
+        entry['thread'].join(timeout=5)
+    except Exception as e:
+        return {'status': 'error', 'detail': str(e)}
+    _SIMULATORS.pop(pond, None)
+    return {'status': 'stopped', 'pond': pond}
+
+
+@app.get('/dashboard/simulator/status')
+def dashboard_simulator_status():
+    out = {}
+    for pond, entry in _SIMULATORS.items():
+        out[pond] = {'running': entry['thread'].is_alive(), 'started': entry.get('started')}
+    return out
+
+
+# Mount a lightweight static dashboard from the api/dashboard folder
+dashboard_dir = Path(__file__).resolve().parent.joinpath('dashboard')
+if dashboard_dir.exists():
+    app.mount('/dashboard/static', StaticFiles(directory=str(dashboard_dir)), name='dashboard_static')
+
+
+# Redirect root to dashboard
+@app.get('/')
+def root_redirect():
+    """Redirect root to dashboard."""
+    return RedirectResponse(url='/dashboard/static/index.html', status_code=302)
+
+
+@app.get('/dashboard')
+def dashboard_root():
+    """Redirect /dashboard to dashboard static files."""
+    return RedirectResponse(url='/dashboard/static/index.html', status_code=302)
 

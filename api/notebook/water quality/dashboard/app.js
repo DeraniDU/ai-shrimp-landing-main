@@ -69,6 +69,17 @@ function buildUI(){
   actions.appendChild(fileInput);
   actions.appendChild(uploadBtn);
   form.appendChild(actions);
+  // Prediction type selector (RF / SVM / KNN / All)
+  const predTypeRow = el('div',{class:'pred-type'});
+  predTypeRow.appendChild(el('label',{text:'Prediction Type:'}));
+  ['all','rf','svm','knn'].forEach(v => {
+    const id = 'pred_' + v;
+    const r = el('input',{type:'radio', name:'predType', id, value:v});
+    if(v === 'all') r.checked = true;
+    const lab = el('label',{text: v.toUpperCase(), for:id});
+    predTypeRow.appendChild(r); predTypeRow.appendChild(lab);
+  });
+  form.appendChild(predTypeRow);
   cardForm.appendChild(form);
   // Auto-preview controls: run predictions periodically
   const autoRow = el('div',{class:'auto-row'});
@@ -110,7 +121,14 @@ function buildUI(){
   const chartWrap = el('div',{class:'chart-wrap'});
   const canvas = el('canvas',{id:'mainChart', width:800, height:320});
   chartWrap.appendChild(canvas);
+  // small dashboard charts: pie (class distribution) and parameter averages
+  const smallCharts = el('div',{class:'small-charts'});
+  const pieCanvas = el('canvas',{id:'pieChart', width:320, height:160});
+  const barCanvas = el('canvas',{id:'barChart', width:320, height:160});
+  smallCharts.appendChild(pieCanvas);
+  smallCharts.appendChild(barCanvas);
   sidePanel.appendChild(chartWrap);
+  sidePanel.appendChild(smallCharts);
 
   // Decision / action box
   const decisionBox = el('div',{class:'decision-box'});
@@ -176,11 +194,18 @@ function buildUI(){
     fields.forEach(k => { payload.input[k] = inputs[k] ? Number(inputs[k]) : 0; });
 
     try{
-        // Use combined endpoint that also persists and broadcasts the sample
-        const combined = await fetch('/dashboard/predict_all', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)}).then(r=>r.json());
-        const rf = combined.rf;
-        const svm = combined.svm;
-        const knn = combined.knn;
+        // Determine which prediction endpoint to call based on user selection
+        const predType = document.querySelector('input[name="predType"]:checked')?.value || 'all';
+        let endpoint = '/dashboard/predict_all';
+        if(predType === 'rf') endpoint = '/dashboard/predict_rf';
+        if(predType === 'svm') endpoint = '/dashboard/predict_svm';
+        if(predType === 'knn') endpoint = '/dashboard/predict_knn';
+
+        const combined = await fetch(endpoint, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)}).then(r=>r.json());
+        // Normalize returned pieces
+        const rf = combined.rf ?? (combined['DO(mg/L)'] ? combined : null);
+        const svm = combined.svm ?? combined;
+        const knn = combined.knn ?? (combined['DO(mg/L)'] ? { 'DO(mg/L)': combined['DO(mg/L)'] } : null);
 
       showJSON(combined);
       const w = computeWQI(rf, svm);
@@ -296,12 +321,41 @@ function buildUI(){
   };
   const mainChart = new Chart(ctx, { type:'line', data: chartData, options: { responsive:true, maintainAspectRatio:false, scales:{ x:{ display:true }, y:{ beginAtZero:true } } } });
 
+  // small charts contexts
+  const pieCtx = document.getElementById('pieChart').getContext('2d');
+  const barCtx = document.getElementById('barChart').getContext('2d');
+  const pieChart = new Chart(pieCtx, { type:'pie', data:{ labels:['Poor','Moderate','Good'], datasets:[{ data:[0,0,0], backgroundColor:['#e74c3c','#f39c12','#27ae60'] }] }, options:{ responsive:true } });
+  const barChart = new Chart(barCtx, { type:'bar', data:{ labels:[], datasets:[{ label:'Average', data:[], backgroundColor:'#6a9c78' }] }, options:{ responsive:true } });
+
   function updateChartFromHistory(){
+    // main time-series
     chartData.labels = history.map(s => new Date(s.ts).toLocaleTimeString());
     chartData.datasets[0].data = history.map(s => Number(s.rf?.['DO(mg/L)'] || s.sensors?.['DO(mg/L)'] || 0));
     chartData.datasets[1].data = history.map(s => Number(s.rf?.pH || s.sensors?.pH || 0));
     chartData.datasets[2].data = history.map(s => Number(s.rf?.['Ammonia (mg L-1 )'] || s.sensors?.['Ammonia (mg L-1 )'] || 0));
     mainChart.update();
+
+    // pie: class distribution from svm outputs
+    const counts = [0,0,0];
+    history.forEach(h => { const cls = Number(h.svm?.class ?? h.svm?.class || h.rf?.class); if(!isNaN(cls) && cls >=0 && cls<=2) counts[cls]++; });
+    pieChart.data.datasets[0].data = counts;
+    pieChart.update();
+
+    // bar: parameter averages (take most common numeric keys from sensors/rf)
+    const sums = {};
+    const cnts = {};
+    history.forEach(h => {
+      const src = Object.assign({}, h.sensors || {}, h.rf || {});
+      Object.keys(src).forEach(k => {
+        const v = Number(src[k]);
+        if(!isNaN(v)) { sums[k] = (sums[k]||0)+v; cnts[k] = (cnts[k]||0)+1; }
+      });
+    });
+    const keys = Object.keys(sums).sort((a,b)=> (sums[b]/cnts[b]) - (sums[a]/cnts[a])).slice(0,8);
+    const avgs = keys.map(k => +(sums[k]/cnts[k]).toFixed(3));
+    barChart.data.labels = keys;
+    barChart.data.datasets[0].data = avgs;
+    barChart.update();
   }
 
   // load initial server history to populate chart
