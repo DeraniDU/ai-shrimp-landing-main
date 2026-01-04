@@ -21,9 +21,9 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 
 	const totalEnergyCost = energy.reduce((sum, e) => sum + e.cost, 0)
 	const totalFeedKg = feed.reduce((sum, f) => f.feed_amount, 0) / 1000
-	const feedCostPerKg = 1.2
+	const feedCostPerKg = 400 // LKR per kg
 	const totalFeedCost = totalFeedKg * feedCostPerKg
-	const totalLaborCost = labor.reduce((sum, l) => sum + l.time_spent * 15, 0) // $15/hour estimate
+	const totalLaborCost = labor.reduce((sum, l) => sum + l.time_spent * 500, 0) // Rs. 500/hour estimate
 
 	const efficiencyChart = {
 		labels: ['Feed', 'Energy', 'Labor'],
@@ -50,7 +50,7 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 		labels: ['Feed', 'Energy', 'Labor'],
 		datasets: [
 			{
-				label: 'Cost ($)',
+				label: 'Cost (LKR)',
 				data: [totalFeedCost, totalEnergyCost, totalLaborCost],
 				backgroundColor: ['rgba(34, 197, 94, 0.7)', 'rgba(59, 130, 246, 0.7)', 'rgba(245, 158, 11, 0.7)'],
 				borderRadius: 6
@@ -78,7 +78,7 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 		},
 		scales: {
 			x: { grid: { display: false } },
-			y: { grid: { color: 'rgba(17, 24, 39, 0.08)' }, title: { display: true, text: 'Cost ($)' } }
+			y: { grid: { color: 'rgba(17, 24, 39, 0.08)' }, title: { display: true, text: 'Cost (LKR)' } }
 		}
 	}
 
@@ -88,21 +88,21 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 			title: 'Optimize Aerator Usage',
 			description: `Current energy efficiency is ${formatNumber(energyEfficiency * 100, { maximumFractionDigits: 0 })}%. Consider scheduling aerators based on DO levels.`,
 			impact: 'High',
-			savings: `~$${formatNumber(totalEnergyCost * 0.15, { maximumFractionDigits: 0 })}/day`
+			savings: `~Rs. ${formatNumber(totalEnergyCost * 0.15, { maximumFractionDigits: 0 })}/day`
 		},
 		{
 			category: 'Feed',
 			title: 'Improve Feed Conversion',
 			description: `Feed efficiency at ${formatNumber(feedEfficiency * 100, { maximumFractionDigits: 0 })}%. Adjust feeding schedule based on water temperature.`,
 			impact: 'High',
-			savings: `~$${formatNumber(totalFeedCost * 0.1, { maximumFractionDigits: 0 })}/day`
+			savings: `~Rs. ${formatNumber(totalFeedCost * 0.1, { maximumFractionDigits: 0 })}/day`
 		},
 		{
 			category: 'Labor',
 			title: 'Streamline Tasks',
 			description: `Labor efficiency at ${formatNumber(laborEfficiency * 100, { maximumFractionDigits: 0 })}%. Automate routine monitoring tasks.`,
 			impact: 'Medium',
-			savings: `~$${formatNumber(totalLaborCost * 0.2, { maximumFractionDigits: 0 })}/day`
+			savings: `~Rs. ${formatNumber(totalLaborCost * 0.2, { maximumFractionDigits: 0 })}/day`
 		}
 	]
 
@@ -155,7 +155,7 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 					<div className="kpiMini">
 						<div className="muted">Total Daily Cost</div>
 						<div className="kpiMiniValue mono">
-							${formatNumber(totalFeedCost + totalEnergyCost + totalLaborCost, { maximumFractionDigits: 2 })}
+							Rs. {formatNumber(totalFeedCost + totalEnergyCost + totalLaborCost, { maximumFractionDigits: 2 })}
 						</div>
 					</div>
 				</div>

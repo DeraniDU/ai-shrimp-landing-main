@@ -97,8 +97,8 @@ export function DashboardView({ data, history, pondFilter }: Props) {
 
 	const latestBiomassKg = sum(feed.map((f) => (f.shrimp_count * f.average_weight) / 1000)) // g -> kg
 	const projectedHarvestTons = latestBiomassKg / 1000
-	const shrimpPricePerKg = 6.5
-	const feedCostPerKg = 1.2
+	const shrimpPricePerKg = 2000 // LKR per kg
+	const feedCostPerKg = 400 // LKR per kg
 	const estimatedRevenue = latestBiomassKg * shrimpPricePerKg
 	const estimatedCosts = totalEnergyCost + (totalFeedG / 1000) * feedCostPerKg
 	const profitMargin = estimatedRevenue > 0 ? (estimatedRevenue - estimatedCosts) / estimatedRevenue : 0
@@ -166,7 +166,7 @@ export function DashboardView({ data, history, pondFilter }: Props) {
 			},
 			{
 				type: 'line' as const,
-				label: 'Revenue ($)',
+				label: 'Revenue (LKR)',
 				data: revenueSeries,
 				borderColor: 'rgba(37, 99, 235, 0.95)',
 				backgroundColor: 'rgba(37, 99, 235, 0.10)',
@@ -187,7 +187,7 @@ export function DashboardView({ data, history, pondFilter }: Props) {
 			y1: {
 				position: 'right',
 				grid: { display: false },
-				ticks: { color: axisColor, callback: (v) => `$${Number(v) / 1000}k` }
+				ticks: { color: axisColor, callback: (v) => `Rs. ${Number(v) / 1000}k` }
 			}
 		}
 	}
@@ -256,7 +256,7 @@ export function DashboardView({ data, history, pondFilter }: Props) {
 					<ActionButton label="Clean" />
 				</div>
 				<div className="muted" style={{ marginTop: 10 }}>
-					Energy: <span className="mono">{formatNumber(totalEnergyKwh, { maximumFractionDigits: 1 })}</span> kWh · Cost: $
+					Energy: <span className="mono">{formatNumber(totalEnergyKwh, { maximumFractionDigits: 1 })}</span> kWh · Cost: Rs.{' '}
 					<span className="mono">{formatNumber(totalEnergyCost, { maximumFractionDigits: 2 })}</span>
 				</div>
 			</div>
@@ -297,7 +297,7 @@ export function DashboardView({ data, history, pondFilter }: Props) {
 					</div>
 					<div className="summaryItem">
 						<div className="muted">Estimated Revenue:</div>
-						<div className="summaryValue mono">${formatNumber(estimatedRevenue, { maximumFractionDigits: 0 })}</div>
+						<div className="summaryValue mono">Rs. {formatNumber(estimatedRevenue, { maximumFractionDigits: 0 })}</div>
 					</div>
 				</div>
 				<div className="chartBoxLg">
@@ -537,7 +537,7 @@ export function DashboardView({ data, history, pondFilter }: Props) {
 						details={[
 							`Between **${calculateHarvestWindow(historyAvgWeight)}** (FCR ${typeof fcr === 'number' ? formatNumber(fcr, { maximumFractionDigits: 1 }) : '1.3'})`,
 							`Projected Yield: **${formatNumber(projectedHarvestTons, { maximumFractionDigits: 1 })} tons**`,
-							`Market Price: **$${formatNumber(shrimpPricePerKg, { maximumFractionDigits: 2 })}/kg**`
+							`Market Price: **Rs. ${formatNumber(shrimpPricePerKg, { maximumFractionDigits: 0 })}/kg**`
 						]}
 						harvestChartData={{
 							labels: historyLabels.slice(-7),
