@@ -178,6 +178,42 @@ export type HistoryApiResponse = {
 	items: SavedFarmSnapshot[]
 }
 
+export type ForecastDataPoint = {
+	day: number
+	avg_weight_g?: number
+	biomass_kg?: number
+	ph?: number
+	dissolved_oxygen?: number
+	temperature?: number
+	salinity?: number
+	risk_level?: number
+	risk_type?: string
+	factors?: string[]
+	revenue_lkr?: number
+	costs_lkr?: number
+	profit_lkr?: number
+}
+
+export type HarvestWindow = {
+	optimal_start: string
+	optimal_end: string
+	projected_yield_tons: number
+	fcr: number
+}
+
+export type ForecastsResponse = {
+	forecasts: {
+		growth_forecast: ForecastDataPoint[]
+		water_quality_forecast: ForecastDataPoint[]
+		disease_risk_forecast: ForecastDataPoint[]
+		profit_forecast: ForecastDataPoint[]
+		harvest_window: HarvestWindow
+		ai_predictions: string[]
+	}
+	timestamp: string
+	forecast_days: number
+}
+
 
 
 

@@ -13,17 +13,15 @@ from datetime import datetime
 import asyncio
 
 class ManagerAgent:
-    def __init__(self, use_autogluon: Optional[bool] = None, decision_agent_type: Optional[str] = None):
+    def __init__(self, use_decision_agent: Optional[bool] = None):
         """
         Initialize Manager Agent.
         
         Args:
-            use_autogluon: Whether to use AutoGluon for decisions. 
-                          If None, uses config setting.
-            decision_agent_type: Override which decision agent to use.
-                                One of: "autogluon", "xgboost", "simple", "tiny", "none".
+            use_decision_agent: Whether to use XGBoost decision agent. 
+                               If None, uses config setting.
         """
-        # LLM is optional: AutoGluon / rule-based dashboards should work without an OpenAI key.
+        # LLM is optional: XGBoost / rule-based dashboards should work without an OpenAI key.
         self.llm = None
         self.agent = None
 
@@ -45,89 +43,31 @@ class ManagerAgent:
                 llm=self.llm,
             )
         
-        # Initialize decision agent if enabled
-        # Backwards-compat:
-        # - use_autogluon=True  => force "autogluon"
-        # - use_autogluon=False => disable decisions entirely
+        # Initialize XGBoost decision agent if enabled
         enabled_by_config = bool(DECISION_MODEL_CONFIG.get("use_decision_model", False))
-        if use_autogluon is False:
-            self.use_decision_agent = False
-            requested_type = "none"
-        else:
-            requested_type = (decision_agent_type or DECISION_MODEL_CONFIG.get("agent_type", "autogluon") or "autogluon").lower()
-            if use_autogluon is True:
-                requested_type = "autogluon"
-            self.use_decision_agent = enabled_by_config and requested_type != "none"
-
-        self.decision_agent_type = requested_type
+        self.use_decision_agent = use_decision_agent if use_decision_agent is not None else enabled_by_config
+        self.decision_agent_type = "xgboost"
         self.decision_agent = None
         
         if self.use_decision_agent:
-            if self.decision_agent_type in ("tiny", "minimal", "lite"):
-                from models.tiny_decision_agent import TinyDecisionAgent
+            try:
+                from models.xgboost_decision_agent import XGBoostDecisionAgent
 
-                self.decision_agent = TinyDecisionAgent()
-                print("[OK] Tiny decision agent initialized (minimal rules)")
-
-            elif self.decision_agent_type in ("simple", "rules", "rule_based", "baseline"):
-                from models.simple_decision_agent import SimpleDecisionAgent
-
-                self.decision_agent = SimpleDecisionAgent()
-                print("[OK] Simple decision agent initialized (rule-based)")
-
-            elif self.decision_agent_type in ("xgboost", "xgb"):
-                # Lightweight ML-based agent; fall back safely if deps/models missing.
-                try:
-                    from models.xgboost_decision_agent import XGBoostDecisionAgent
-
-                    self.decision_agent = XGBoostDecisionAgent()
-                    if getattr(self.decision_agent, "is_trained", False):
-                        print("[OK] XGBoost decision agent initialized and ready")
-                    else:
-                        print("[WARN] XGBoost models not trained. Falling back to simple decision agent.")
-                        from models.simple_decision_agent import SimpleDecisionAgent
-
-                        self.decision_agent = SimpleDecisionAgent()
-                        self.decision_agent_type = "simple"
-                except ImportError:
-                    print("[WARN] XGBoost not available. Falling back to simple decision agent.")
-                    from models.simple_decision_agent import SimpleDecisionAgent
-
-                    self.decision_agent = SimpleDecisionAgent()
-                    self.decision_agent_type = "simple"
-                except Exception as e:
-                    print(f"[WARN] Error initializing XGBoost decision agent: {e}. Falling back to simple decision agent.")
-                    from models.simple_decision_agent import SimpleDecisionAgent
-
-                    self.decision_agent = SimpleDecisionAgent()
-                    self.decision_agent_type = "simple"
-
-            else:
-                # Default to AutoGluon; fall back to SimpleDecisionAgent when not available
-                try:
-                    from models.autogluon_decision_agent import AutoGluonDecisionAgent
-
-                    self.decision_agent = AutoGluonDecisionAgent()
-                    if getattr(self.decision_agent, "is_trained", False):
-                        print("[OK] AutoGluon decision agent initialized and ready")
-                    else:
-                        print("[WARN] AutoGluon models not trained. Falling back to simple decision agent.")
-                        from models.simple_decision_agent import SimpleDecisionAgent
-
-                        self.decision_agent = SimpleDecisionAgent()
-                        self.decision_agent_type = "simple"
-                except ImportError:
-                    print("[WARN] AutoGluon not available. Falling back to simple decision agent.")
-                    from models.simple_decision_agent import SimpleDecisionAgent
-
-                    self.decision_agent = SimpleDecisionAgent()
-                    self.decision_agent_type = "simple"
-                except Exception as e:
-                    print(f"[WARN] Error initializing decision agent: {e}. Falling back to simple decision agent.")
-                    from models.simple_decision_agent import SimpleDecisionAgent
-
-                    self.decision_agent = SimpleDecisionAgent()
-                    self.decision_agent_type = "simple"
+                self.decision_agent = XGBoostDecisionAgent()
+                if getattr(self.decision_agent, "is_trained", False):
+                    print("[OK] XGBoost decision agent initialized and ready")
+                else:
+                    print("[WARN] XGBoost models not trained. Decision agent will not be used.")
+                    self.decision_agent = None
+                    self.use_decision_agent = False
+            except ImportError:
+                print("[ERROR] XGBoost decision agent not available. Please install required dependencies.")
+                self.decision_agent = None
+                self.use_decision_agent = False
+            except Exception as e:
+                print(f"[ERROR] Error initializing XGBoost decision agent: {e}")
+                self.decision_agent = None
+                self.use_decision_agent = False
     
     def create_synthesis_task(self, water_quality_data: List[WaterQualityData], 
                             feed_data: List[FeedData], energy_data: List[EnergyData], 
@@ -223,7 +163,7 @@ class ManagerAgent:
         # Generate alerts
         alerts = self._generate_alerts(water_quality_data, feed_data, energy_data, labor_data)
         
-        # Generate recommendations (now includes XGBoost decision agent outputs)
+        # Generate recommendations (uses XGBoost decision agent if available)
         recommendations = self._generate_recommendations(water_quality_data, feed_data, energy_data, labor_data)
         
         # Get decision bundle for other uses (e.g., insights, alerts)
@@ -381,11 +321,11 @@ class ManagerAgent:
                                  labor_data: List[LaborData]) -> List[str]:
         """
         Generate strategic recommendations based on XGBoost decision agent outputs.
-        Falls back to rule-based recommendations if decision agent is not available.
+        Falls back to rule-based recommendations if XGBoost decision agent is not available.
         """
         recommendations = []
         
-        # Prioritize recommendations from decision agent (XGBoost/AutoGluon)
+        # Prioritize recommendations from XGBoost decision agent
         if self.decision_agent and getattr(self.decision_agent, "is_trained", True):
             try:
                 decision_bundle = self.decision_agent.make_multi_pond_decisions(

@@ -23,7 +23,7 @@ export default function App() {
 		autoRefreshMs: autoRefresh ? 15_000 : null
 	})
 	const { data: historyData, loading: historyLoading, error: historyError, refresh: refreshHistory } = useHistoryData({
-		limit: 60
+		days: 7
 	})
 
 	const pondIds = useMemo(() => {

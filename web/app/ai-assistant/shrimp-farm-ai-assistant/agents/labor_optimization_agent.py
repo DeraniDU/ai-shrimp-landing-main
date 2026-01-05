@@ -7,16 +7,24 @@ try:
 except Exception:  # pragma: no cover
     from langchain.chat_models import ChatOpenAI  # type: ignore
 from models import LaborData, WaterQualityData, EnergyData
-from config import OPENAI_API_KEY, OPENAI_MODEL_NAME, OPENAI_TEMPERATURE
-import random
+from config import OPENAI_API_KEY, OPENAI_MODEL_NAME, OPENAI_TEMPERATURE, USE_MONGODB
 from datetime import datetime, timedelta
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 class LaborOptimizationAgent:
     def __init__(self):
         # LLM is optional; simulation mode and downstream dashboards should work without an OpenAI key.
         self.llm = None
         self.agent = None
+        self.repository = None
+        
+        # Initialize MongoDB repository if enabled
+        if USE_MONGODB:
+            try:
+                from database.repository import DataRepository
+                self.repository = DataRepository()
+            except Exception as e:
+                print(f"Warning: Could not initialize MongoDB repository: {e}")
 
         if OPENAI_API_KEY:
             self.llm = ChatOpenAI(
@@ -70,69 +78,22 @@ class LaborOptimizationAgent:
             expected_output="Detailed labor optimization plan with scheduling, task prioritization, and efficiency improvements"
         )
     
-    def simulate_labor_data(self, pond_id: int, water_quality_data: WaterQualityData, 
-                           energy_data: EnergyData) -> LaborData:
-        """Simulate realistic labor data based on farm conditions"""
+    def get_labor_data(self, pond_id: int, water_quality_data: Optional[WaterQualityData] = None,
+                      energy_data: Optional[EnergyData] = None) -> LaborData:
+        """Get labor data from MongoDB"""
+        if not self.repository or not self.repository.is_available:
+            raise ValueError(f"MongoDB repository not available. Cannot fetch labor data for pond {pond_id}")
         
-        # Base tasks that are typically performed
-        base_tasks = [
-            "Water quality testing",
-            "Feed distribution", 
-            "Equipment maintenance",
-            "Pond cleaning",
-            "Shrimp health monitoring",
-            "Data recording"
-        ]
-        
-        # Add urgent tasks based on conditions
-        urgent_tasks = []
-        if water_quality_data.dissolved_oxygen < 5:
-            urgent_tasks.append("Emergency aeration check")
-        if water_quality_data.ammonia > 0.2:
-            urgent_tasks.append("Water exchange")
-        if energy_data.efficiency_score < 0.7:
-            urgent_tasks.append("Equipment inspection")
-        
-        # Simulate completed tasks (some base tasks + urgent tasks)
-        completed_tasks = random.sample(base_tasks, random.randint(2, 4))
-        if urgent_tasks:
-            completed_tasks.extend(random.sample(urgent_tasks, min(2, len(urgent_tasks))))
-        
-        # Calculate time spent based on task complexity and conditions
-        base_time = len(completed_tasks) * 0.5  # 30 minutes per task
-        urgency_multiplier = 1.0
-        
-        if urgent_tasks:
-            urgency_multiplier += 0.3
-        if water_quality_data.status.value in ["poor", "critical"]:
-            urgency_multiplier += 0.2
-        
-        time_spent = base_time * urgency_multiplier
-        
-        # Determine worker count based on urgency
-        worker_count = 1
-        if len(urgent_tasks) > 1:
-            worker_count = 2
-        if water_quality_data.status.value == "critical":
-            worker_count = 3
-        
-        # Calculate efficiency score
-        efficiency_score = self._calculate_labor_efficiency(
-            completed_tasks, time_spent, worker_count, water_quality_data
-        )
-        
-        # Generate next tasks
-        next_tasks = self._generate_next_tasks(water_quality_data, energy_data, completed_tasks)
-        
-        return LaborData(
-            timestamp=datetime.now(),
-            pond_id=pond_id,
-            tasks_completed=completed_tasks,
-            time_spent=time_spent,
-            worker_count=worker_count,
-            efficiency_score=efficiency_score,
-            next_tasks=next_tasks
-        )
+        try:
+            data = self.repository.get_latest_labor_data(pond_id)
+            if data:
+                print(f"[DB] Fetched labor data for pond {pond_id} from MongoDB")
+                return data
+            else:
+                raise ValueError(f"No labor data found in database for pond {pond_id}")
+        except Exception as e:
+            print(f"Error: Could not fetch from MongoDB: {e}")
+            raise
     
     def _calculate_labor_efficiency(self, completed_tasks: List[str], time_spent: float, 
                                   worker_count: int, water_quality_data: WaterQualityData) -> float:

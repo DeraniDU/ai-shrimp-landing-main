@@ -12,12 +12,14 @@ import logging
 import time
 from datetime import datetime, timedelta
 from typing import List, Dict, Any
-import json
-import os
-from pathlib import Path
 
 from crewai import Crew
-from langchain.chat_models import ChatOpenAI
+# LangChain has moved OpenAI chat models across packages over time.
+# Try the modern import first, then fall back for older LangChain versions.
+try:
+    from langchain_openai import ChatOpenAI  # type: ignore
+except Exception:  # pragma: no cover
+    from langchain.chat_models import ChatOpenAI  # type: ignore
 
 from config import OPENAI_API_KEY, OPENAI_MODEL_NAME, OPENAI_TEMPERATURE, FARM_CONFIG, AGENT_CONFIG
 from models import ShrimpFarmDashboard, WaterQualityData, FeedData, EnergyData, LaborData
@@ -115,11 +117,27 @@ class ShrimpFarmOrchestrator:
         """Collect data from all specialized agents"""
         logger.info("Collecting data from all agents...")
         
+        # Initialize repository for saving data
+        repository = None
+        try:
+            from database.repository import DataRepository
+            repository = DataRepository()
+            if repository.is_available:
+                logger.info("MongoDB repository available - data will be saved to database")
+        except Exception as e:
+            logger.debug(f"MongoDB repository not available: {e}")
+        
         # Water quality monitoring
         water_quality_data = []
         for pond_id in range(1, FARM_CONFIG['pond_count'] + 1):
-            wq_data = self.water_quality_agent.simulate_water_quality_data(pond_id)
+            wq_data = self.water_quality_agent.get_water_quality_data(pond_id)
             water_quality_data.append(wq_data)
+            # Save to database if available
+            if repository and repository.is_available:
+                try:
+                    repository.save_water_quality_data(wq_data)
+                except Exception as e:
+                    logger.debug(f"Could not save water quality data to DB: {e}")
         
         self.farm_data['water_quality'] = water_quality_data
         logger.info(f"Collected water quality data for {len(water_quality_data)} ponds")
@@ -128,13 +146,14 @@ class ShrimpFarmOrchestrator:
         feed_data = []
         for i, wq_data in enumerate(water_quality_data):
             pond_id = i + 1
-            current_shrimp_data = {
-                'count': 10000,  # Simulated shrimp count
-                'weight': 12.5,  # Simulated average weight
-                'feed_type': 'Grower Feed'
-            }
-            feed_data_item = self.feed_agent.simulate_feed_data(pond_id, wq_data)
+            feed_data_item = self.feed_agent.get_feed_data(pond_id, wq_data)
             feed_data.append(feed_data_item)
+            # Save to database if available
+            if repository and repository.is_available:
+                try:
+                    repository.save_feed_data(feed_data_item)
+                except Exception as e:
+                    logger.debug(f"Could not save feed data to DB: {e}")
         
         self.farm_data['feed'] = feed_data
         logger.info(f"Collected feed data for {len(feed_data)} ponds")
@@ -143,8 +162,14 @@ class ShrimpFarmOrchestrator:
         energy_data = []
         for i, wq_data in enumerate(water_quality_data):
             pond_id = i + 1
-            energy_data_item = self.energy_agent.simulate_energy_data(pond_id, wq_data)
+            energy_data_item = self.energy_agent.get_energy_data(pond_id, wq_data)
             energy_data.append(energy_data_item)
+            # Save to database if available
+            if repository and repository.is_available:
+                try:
+                    repository.save_energy_data(energy_data_item)
+                except Exception as e:
+                    logger.debug(f"Could not save energy data to DB: {e}")
         
         self.farm_data['energy'] = energy_data
         logger.info(f"Collected energy data for {len(energy_data)} ponds")
@@ -153,11 +178,21 @@ class ShrimpFarmOrchestrator:
         labor_data = []
         for i, (wq_data, energy_data_item) in enumerate(zip(water_quality_data, energy_data)):
             pond_id = i + 1
-            labor_data_item = self.labor_agent.simulate_labor_data(pond_id, wq_data, energy_data_item)
+            labor_data_item = self.labor_agent.get_labor_data(pond_id, wq_data, energy_data_item)
             labor_data.append(labor_data_item)
+            # Save to database if available
+            if repository and repository.is_available:
+                try:
+                    repository.save_labor_data(labor_data_item)
+                except Exception as e:
+                    logger.debug(f"Could not save labor data to DB: {e}")
         
         self.farm_data['labor'] = labor_data
         logger.info(f"Collected labor data for {len(labor_data)} ponds")
+        
+        # Close repository connection
+        if repository:
+            repository.close()
     
     async def generate_insights(self):
         """Generate insights and recommendations using the manager agent"""
@@ -260,63 +295,14 @@ class ShrimpFarmOrchestrator:
         }
     
     def save_farm_data(self, filename: str = None):
-        """Save farm data to JSON file"""
-        if not filename:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"farm_data_{timestamp}.json"
+        """
+        Save farm data to MongoDB (deprecated - data is now saved automatically during collect_agent_data).
         
-        # Convert data to serializable format
-        serializable_data = {
-            'timestamp': datetime.now().isoformat(),
-            'water_quality': [
-                {
-                    'pond_id': data.pond_id,
-                    'ph': data.ph,
-                    'temperature': data.temperature,
-                    'dissolved_oxygen': data.dissolved_oxygen,
-                    'salinity': data.salinity,
-                    'status': data.status.value,
-                    'alerts': data.alerts
-                }
-                for data in self.farm_data['water_quality']
-            ],
-            'feed': [
-                {
-                    'pond_id': data.pond_id,
-                    'shrimp_count': data.shrimp_count,
-                    'average_weight': data.average_weight,
-                    'feed_amount': data.feed_amount,
-                    'feed_type': data.feed_type,
-                    'feeding_frequency': data.feeding_frequency
-                }
-                for data in self.farm_data['feed']
-            ],
-            'energy': [
-                {
-                    'pond_id': data.pond_id,
-                    'total_energy': data.total_energy,
-                    'cost': data.cost,
-                    'efficiency_score': data.efficiency_score
-                }
-                for data in self.farm_data['energy']
-            ],
-            'labor': [
-                {
-                    'pond_id': data.pond_id,
-                    'tasks_completed': data.tasks_completed,
-                    'time_spent': data.time_spent,
-                    'worker_count': data.worker_count,
-                    'efficiency_score': data.efficiency_score
-                }
-                for data in self.farm_data['labor']
-            ]
-        }
-        
-        with open(filename, 'w') as f:
-            json.dump(serializable_data, f, indent=2)
-        
-        logger.info(f"Farm data saved to {filename}")
-        return filename
+        This method is kept for backward compatibility but does nothing since data is already
+        saved to MongoDB during the data collection phase.
+        """
+        logger.info("Farm data is automatically saved to MongoDB during data collection")
+        return None
     
     def stop_monitoring(self):
         """Stop the monitoring cycle"""
@@ -356,9 +342,8 @@ async def main():
         print(f"Active Alerts: {status['alerts_count']}")
         print(f"Insights: {status['insights_count']}")
         
-        # Save data
-        filename = orchestrator.save_farm_data()
-        print(f"\nFarm data saved to: {filename}")
+        # Data is automatically saved to MongoDB during collect_agent_data()
+        print(f"\nFarm data saved to MongoDB during data collection")
         
         # Ask user if they want to start continuous monitoring
         print("\n" + "=" * 50)
