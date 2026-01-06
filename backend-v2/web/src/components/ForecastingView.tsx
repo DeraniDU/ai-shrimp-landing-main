@@ -459,9 +459,7 @@ export function ForecastingView({ data, history, pondFilter }: Props) {
 											flexShrink: 0,
 											marginTop: 2
 										}}
-									>
-										✓
-									</div>
+									/>
 									<div className="muted" style={{ fontSize: '0.875rem', lineHeight: 1.5, flex: 1 }}>
 										{prediction}
 									</div>

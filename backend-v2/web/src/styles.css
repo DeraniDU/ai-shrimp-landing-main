@@ -1369,6 +1369,1411 @@ button:disabled {
   flex: 1;
 }
 
+/* ============================================================
+   AI PREDICTIONS PANEL STYLES
+   ============================================================ */
+
+.aiPredictionsPanel {
+  padding: 0;
+}
+
+.predictionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.03), rgba(16, 185, 129, 0.03));
+}
+
+.predictionTitle {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.predictionTitle h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.predictionSubtitle {
+  font-size: 12px;
+  color: var(--muted);
+  display: block;
+  margin-top: 2px;
+}
+
+.aiIcon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.horizonSelector {
+  display: flex;
+  gap: 4px;
+  background: rgba(17, 24, 39, 0.05);
+  padding: 4px;
+  border-radius: 10px;
+}
+
+.horizonBtn {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.horizonBtn:hover {
+  color: var(--text);
+  transform: none;
+}
+
+.horizonBtn.active {
+  background: white;
+  color: var(--info);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Summary Cards */
+.predictionSummary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.summaryCard {
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: var(--panel-2);
+}
+
+.summaryLabel {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.summaryValue {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.summaryMeta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.criticalBadge {
+  background: rgba(220, 38, 38, 0.15);
+  color: var(--bad);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.warningBadge {
+  background: rgba(217, 119, 6, 0.15);
+  color: var(--warn);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* Prediction Grid */
+.predictionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 20px;
+  padding: 24px;
+}
+
+.predictionCard {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.predictionCard:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.predictionCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: var(--panel-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.pondLabel {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.wqiBadge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Forecast Table */
+.forecastTable {
+  padding: 0;
+}
+
+.forecastRow {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 1.2fr 0.6fr;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(17, 24, 39, 0.06);
+  align-items: center;
+}
+
+.forecastRow:last-child {
+  border-bottom: none;
+}
+
+.forecastRow.header {
+  background: rgba(17, 24, 39, 0.02);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.forecastCell {
+  font-size: 13px;
+}
+
+.forecastCell.label {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.forecastCell.mono {
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+}
+
+/* Predicted WQI */
+.predictedWQI {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.04), rgba(16, 185, 129, 0.04));
+  border-top: 1px solid var(--border);
+}
+
+.predictedWQILabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.predictedWQIValue {
+  font-size: 24px;
+  font-weight: 700;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.predictedWQIClass {
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* Alerts List */
+.alertsList {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.alertItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border-left: 3px solid;
+}
+
+.alertIcon {
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.alertContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.alertTitle {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.alertMessage {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* Recommendations Section */
+.recommendationsSection {
+  padding: 24px;
+  border-top: 1px solid var(--border);
+  background: var(--panel-2);
+}
+
+.recommendationsSection h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.recommendationsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.recommendationCard {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 10px;
+  transition: transform 0.2s ease;
+}
+
+.recommendationCard:hover {
+  transform: translateX(4px);
+}
+
+.recIcon {
+  font-size: 24px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.recContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.recTitle {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.recDescription {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .predictionSummary {
+    grid-template-columns: 1fr;
+  }
+  
+  .predictionGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .predictionHeader {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .horizonSelector {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .forecastRow {
+    grid-template-columns: 1.5fr 1fr 1fr 0.5fr;
+    padding: 10px 16px;
+    font-size: 12px;
+  }
+}
+
+/* ============================================================
+   FARMER-FRIENDLY AI PREDICTIONS PANEL
+   ============================================================ */
+
+.aiPanel {
+  background: var(--panel);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin-top: 24px;
+}
+
+.aiPanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(16, 185, 129, 0.05));
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.aiPanelTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.aiPanelTitle .aiIcon {
+  font-size: 32px;
+}
+
+.aiPanelTitle h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.aiSubtitle {
+  font-size: 12px;
+  color: var(--muted);
+  display: block;
+  margin-top: 2px;
+}
+
+.aiControls {
+  display: flex;
+  gap: 12px;
+}
+
+/* Farm Summary Cards */
+.farmSummary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding: 20px 24px;
+  background: var(--panel-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.farmSummary .summaryCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--panel);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.summaryIcon {
+  font-size: 28px;
+}
+
+.summaryContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.summaryLabel {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.farmSummary .summaryValue {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.criticalBadge {
+  display: inline-block;
+  font-size: 11px;
+  padding: 2px 8px;
+  background: rgba(220, 38, 38, 0.1);
+  color: var(--bad);
+  border-radius: 999px;
+  margin-top: 4px;
+}
+
+/* Pond Selector Tabs */
+.pondTabs {
+  display: flex;
+  gap: 8px;
+  padding: 16px 24px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+
+.pondTab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--panel-2);
+  border: 2px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.pondTab.active {
+  background: var(--panel);
+  border-width: 2px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.pondTab:hover:not(.active) {
+  background: var(--panel);
+}
+
+.pondTabName {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.pondTabStatus {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Prediction Content */
+.predictionContent {
+  padding: 24px;
+}
+
+.predictionRow {
+  margin-bottom: 20px;
+}
+
+.predictionRow:last-child {
+  margin-bottom: 0;
+}
+
+.topRow {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 16px;
+}
+
+.bottomRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Status Cards */
+.statusCard {
+  padding: 20px;
+  border-radius: 14px;
+  border: 2px solid;
+  transition: transform 0.2s ease;
+}
+
+.statusCard:hover {
+  transform: translateY(-2px);
+}
+
+.statusHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.statusLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.statusBadge {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+}
+
+.mainStatus .statusMessage {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.wqiDisplay {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.wqiNumber {
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.wqiLabel {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* Time to Danger Card */
+.dangerCard .safeMessage {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--good);
+  margin-bottom: 4px;
+}
+
+.dangerCard .safeSubtext {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.dangerTime {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.dangerHours {
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.dangerUnit {
+  font-size: 16px;
+  color: var(--muted);
+}
+
+.dangerNow {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--bad);
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.dangerParam {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.dangerMessage {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Night Safety Card */
+.nightDOPreview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.nightDOCurrent, .nightDOPredicted {
+  flex: 1;
+}
+
+.nightDOLabel {
+  font-size: 11px;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.nightDOValue {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.nightDOArrow {
+  font-size: 20px;
+  color: var(--muted);
+}
+
+.nightRecommendation {
+  padding: 8px 12px;
+  background: rgba(0,0,0,0.03);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.aeratorLabel {
+  color: var(--muted);
+}
+
+.aeratorValue {
+  font-weight: 700;
+}
+
+/* Forecast Card */
+.forecastCard {
+  background: var(--panel-2);
+  border-radius: 14px;
+  padding: 20px;
+  border: 1px solid var(--border);
+}
+
+.forecastHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.forecastHeader h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.forecastHorizon {
+  font-size: 12px;
+  padding: 4px 10px;
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--info);
+  border-radius: 999px;
+}
+
+.forecastTableWrapper {
+  overflow-x: auto;
+}
+
+table.forecastTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+table.forecastTable th {
+  text-align: left;
+  padding: 10px 12px;
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+}
+
+table.forecastTable td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+table.forecastTable tr:last-child td {
+  border-bottom: none;
+}
+
+.paramName {
+  font-weight: 500;
+}
+
+.paramValue {
+  font-family: monospace;
+}
+
+.paramTrend {
+  font-size: 18px;
+  text-align: center;
+}
+
+.paramOptimal {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.predictedWqiRow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.predictedWqiBadge {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+/* Trends Card */
+.trendCard {
+  flex: 1;
+  padding: 20px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+}
+
+.trendHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.trendHeader h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.overallTrend {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.trendMessage {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.paramTrends {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.paramTrendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 8px;
+}
+
+.paramTrendName {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.paramTrendDirection {
+  font-size: 16px;
+}
+
+.paramTrendQuality {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.paramTrendQuality.good {
+  background: rgba(22, 163, 74, 0.15);
+  color: var(--good);
+}
+
+.paramTrendQuality.concerning {
+  background: rgba(217, 119, 6, 0.15);
+  color: var(--warn);
+}
+
+.paramTrendQuality.neutral {
+  background: rgba(37, 99, 235, 0.15);
+  color: var(--info);
+}
+
+/* Recovery Card */
+.recoveryCard {
+  flex: 1;
+  padding: 20px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+}
+
+.recoveryCard.healthy {
+  background: rgba(22, 163, 74, 0.05);
+}
+
+.recoveryCard.needsRecovery {
+  background: rgba(217, 119, 6, 0.05);
+}
+
+.recoveryCard h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.recoveryMessage {
+  font-size: 15px;
+  color: var(--good);
+}
+
+.recoveryTime {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.recoveryHours {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--warn);
+}
+
+.recoveryUnit {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.recoveryProgress {
+  margin-bottom: 16px;
+}
+
+.progressBar {
+  height: 8px;
+  background: rgba(0,0,0,0.08);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--warn), var(--good));
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+
+.progressLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.recoveryActions {
+  font-size: 13px;
+}
+
+.actionsLabel {
+  color: var(--muted);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.recoveryActions ul {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.recoveryActions li {
+  margin-bottom: 4px;
+}
+
+/* Alerts Card */
+.alertsCard {
+  background: var(--panel-2);
+  border-radius: 14px;
+  padding: 20px;
+  border: 1px solid var(--border);
+}
+
+.alertsCard h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.alertItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 10px;
+  border-left: 4px solid;
+  margin-bottom: 10px;
+}
+
+.alertItem:last-child {
+  margin-bottom: 0;
+}
+
+.alertIcon {
+  font-size: 20px;
+}
+
+.alertContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.alertTitle {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.alertMessage {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.alertValue {
+  font-size: 14px;
+  font-weight: 700;
+  font-family: monospace;
+}
+
+/* Recommendations Card */
+.recommendationsCard {
+  background: var(--panel-2);
+  border-radius: 14px;
+  padding: 20px;
+  border: 1px solid var(--border);
+}
+
+.recommendationsCard h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.recommendationsCard .recommendationsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.recCard {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 10px;
+  transition: transform 0.2s ease;
+}
+
+.recCard:hover {
+  transform: translateX(4px);
+}
+
+/* Sensor Health Card */
+.sensorHealthCard {
+  padding: 20px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+}
+
+.sensorHealthCard.healthy {
+  background: rgba(22, 163, 74, 0.05);
+}
+
+.sensorHealthCard.issues {
+  background: rgba(217, 119, 6, 0.05);
+}
+
+.sensorHealthCard h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.healthStatus {
+  margin-bottom: 16px;
+}
+
+.healthGood {
+  color: var(--good);
+  font-weight: 600;
+}
+
+.healthBad {
+  color: var(--warn);
+  font-weight: 600;
+}
+
+.confidenceMeter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.confidenceBar {
+  flex: 1;
+  height: 8px;
+  background: rgba(0,0,0,0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.confidenceFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--info), var(--good));
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+
+.sensorIssues {
+  margin-top: 12px;
+}
+
+.sensorIssue {
+  font-size: 12px;
+  padding: 8px;
+  background: rgba(217, 119, 6, 0.1);
+  border-radius: 6px;
+  margin-bottom: 6px;
+  color: var(--warn);
+}
+
+/* Confidence Card */
+.confidenceCard {
+  padding: 20px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+}
+
+.confidenceCard h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.confidenceScores {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.scoreItem {
+  flex: 1;
+  text-align: center;
+  padding: 12px;
+  background: var(--panel);
+  border-radius: 10px;
+}
+
+.scoreLabel {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.scoreValue {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.modelInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.consensusBadge {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.consensusBadge.agree {
+  background: rgba(22, 163, 74, 0.15);
+  color: var(--good);
+}
+
+.consensusBadge.disagree {
+  background: rgba(217, 119, 6, 0.15);
+  color: var(--warn);
+}
+
+.modelMessage {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* Professional Icon Boxes (replacing emojis) */
+.aiIconBox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.9), rgba(16, 185, 129, 0.9));
+  color: white;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  flex-shrink: 0;
+}
+
+.statusDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.statusDot.online {
+  background: var(--good);
+  box-shadow: 0 0 6px rgba(22, 163, 74, 0.5);
+}
+
+.statusDot.offline {
+  background: var(--warn);
+  box-shadow: 0 0 6px rgba(217, 119, 6, 0.5);
+}
+
+.summaryIconBox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.summaryIconBox.wqi {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(16, 185, 129, 0.15));
+  color: var(--info);
+}
+
+.summaryIconBox.alerts {
+  background: rgba(217, 119, 6, 0.12);
+  color: var(--warn);
+  font-size: 18px;
+}
+
+.summaryIconBox.risk {
+  background: rgba(220, 38, 38, 0.1);
+  color: var(--bad);
+}
+
+.summaryIconBox.confidence {
+  background: rgba(22, 163, 74, 0.1);
+  color: var(--good);
+  font-size: 16px;
+}
+
+.alertIconBox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.alertIconBox.critical {
+  background: rgba(220, 38, 38, 0.2);
+  color: var(--bad);
+}
+
+.alertIconBox.warning {
+  background: rgba(217, 119, 6, 0.2);
+  color: var(--warn);
+}
+
+.recIconBox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.recIconBox.info {
+  background: rgba(37, 99, 235, 0.15);
+  color: var(--info);
+}
+
+.recIconBox.warning {
+  background: rgba(217, 119, 6, 0.15);
+  color: var(--warn);
+}
+
+.recIconBox.action {
+  background: rgba(22, 163, 74, 0.15);
+  color: var(--good);
+}
+
+.recIconBox.critical {
+  background: rgba(220, 38, 38, 0.15);
+  color: var(--bad);
+}
+
+.checkIcon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--good);
+  margin-right: 6px;
+  position: relative;
+}
+
+.checkIcon::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 5px;
+  width: 4px;
+  height: 7px;
+  border: 2px solid white;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
+}
+
+.warnIcon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--warn);
+  margin-right: 6px;
+  position: relative;
+}
+
+.warnIcon::after {
+  content: "!";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* Responsive Adjustments for AI Panel */
+@media (max-width: 1200px) {
+  .farmSummary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .topRow {
+    grid-template-columns: 1fr;
+  }
+  
+  .bottomRow {
+    grid-template-columns: 1fr;
+  }
+  
+  .recommendationsCard .recommendationsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .farmSummary {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+  
+  .aiPanelHeader {
+    padding: 16px;
+  }
+  
+  .predictionContent {
+    padding: 16px;
+  }
+  
+  .pondTabs {
+    padding: 12px 16px;
+  }
+  
+  .wqiNumber {
+    font-size: 36px;
+  }
+  
+  .dangerHours {
+    font-size: 32px;
+  }
+  
+  .paramTrends {
+    grid-template-columns: 1fr;
+  }
+  
+  .confidenceScores {
+    flex-direction: column;
+  }
+}
+
+
 
 
 

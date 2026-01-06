@@ -268,7 +268,7 @@ export function DashboardView({ data, history, pondFilter }: Props) {
 						<div className="cameraOverlay">
 							<div className="cameraPill">
 								<span className="check" aria-hidden="true">
-									✓
+									
 								</span>
 								<span>
 									Health Status: <b>Healthy</b>
@@ -503,7 +503,7 @@ export function DashboardView({ data, history, pondFilter }: Props) {
 					{/* Best Feeding Plan */}
 					<ActionPlanCard
 						title="Best Feeding Plan"
-						icon="🔄"
+						icon=""
 						details={[
 							`Feed: **${formatNumber(totalFeedG / 1000, { maximumFractionDigits: 1 })} kg** at **7:00 AM** and **8:00 PM**`,
 							`Feed Type: **${feed.length > 0 ? feed[0].feed_type : '35% protein, balanced vitamins'}**`
@@ -518,7 +518,7 @@ export function DashboardView({ data, history, pondFilter }: Props) {
 					{/* Efficient Labor Plan */}
 					<ActionPlanCard
 						title="Efficient Labor Plan"
-						icon="👥"
+						icon=""
 						details={[
 							`**Monday / Wed / Fri**: Net Cleaning & Shrimp Sampling`,
 							`**Tuesday / Thursday**: Aerator Maintenance`
@@ -533,7 +533,7 @@ export function DashboardView({ data, history, pondFilter }: Props) {
 					{/* Optimal Harvest Plan */}
 					<ActionPlanCard
 						title="Optimal Harvest Plan"
-						icon="📅"
+						icon=""
 						details={[
 							`Between **${calculateHarvestWindow(historyAvgWeight)}** (FCR ${typeof fcr === 'number' ? formatNumber(fcr, { maximumFractionDigits: 1 }) : '1.3'})`,
 							`Projected Yield: **${formatNumber(projectedHarvestTons, { maximumFractionDigits: 1 })} tons**`,
@@ -1124,12 +1124,12 @@ function ActionPlanCard({ title, icon, details, chartData, laborData, harvestCha
 						<div className="actionPlanLabor">
 							<div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
 								{[...Array(Math.min(3, Math.ceil(laborData.totalWorkers / 2)))].map((_, i) => (
-									<div key={i} className="laborIcon" style={{ backgroundColor: '#3b82f6' }}>👤</div>
+									<div key={i} className="laborIcon" style={{ backgroundColor: '#3b82f6' }}>W</div>
 								))}
 								{[...Array(Math.min(3, Math.ceil(laborData.totalWorkers / 2)))].map((_, i) => (
-									<div key={i + 3} className="laborIcon" style={{ backgroundColor: '#22c55e' }}>👤</div>
+									<div key={i + 3} className="laborIcon" style={{ backgroundColor: '#22c55e' }}>W</div>
 								))}
-								<div className="laborIcon" style={{ backgroundColor: '#94a3b8' }}>📋</div>
+								<div className="laborIcon" style={{ backgroundColor: '#94a3b8' }}>T</div>
 							</div>
 						</div>
 					)}

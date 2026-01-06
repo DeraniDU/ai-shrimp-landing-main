@@ -12,13 +12,13 @@ type Props = {
 }
 
 const navItems: NavItem[] = [
-	{ id: 'dashboard', label: 'Dashboard', icon: '📊' },
-	{ id: 'forecasting', label: 'Forecasting', icon: '🔮' },
-	{ id: 'optimization', label: 'Optimization', icon: '⚡' },
-	{ id: 'water-quality', label: 'Water Quality', icon: '💧' },
-	{ id: 'feeding', label: 'Feeding', icon: '🍽️' },
-	{ id: 'disease-detection', label: 'Disease Detection', icon: '🦠' },
-	{ id: 'settings', label: 'Settings', icon: '⚙️' }
+	{ id: 'dashboard', label: 'Dashboard', icon: '' },
+	{ id: 'forecasting', label: 'Forecasting', icon: '' },
+	{ id: 'optimization', label: 'Optimization', icon: '' },
+	{ id: 'water-quality', label: 'Water Quality', icon: '' },
+	{ id: 'feeding', label: 'Feeding', icon: '' },
+	{ id: 'disease-detection', label: 'Disease Detection', icon: '' },
+	{ id: 'settings', label: 'Settings', icon: '' }
 ]
 
 export function Sidebar({ activeView, onViewChange }: Props) {

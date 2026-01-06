@@ -80,3 +80,8 @@ web/dist/
 web/node_modules/
 web/app/ai-assistant/shrimp-farm-ai-assistant/web/dist/
 web/app/ai-assistant/shrimp-farm-ai-assistant/web/node_modules/
+api/notebook/water quality/models/exported_models/dashboard_history.db
+api/notebook/water quality/models/exported_models/dashboard_models/knn_do.joblib
+api/notebook/water quality/models/exported_models/dashboard_models/random_forest_multioutput.joblib
+api/notebook/water quality/water_quality_model.joblib
+api/notebook/water quality/models/exported_models/dashboard_models/svm_classifier.joblib

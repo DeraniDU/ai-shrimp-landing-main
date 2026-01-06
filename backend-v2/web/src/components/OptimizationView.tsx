@@ -329,9 +329,9 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 				<div className="panelHeader">
 					<div className="panelTitle">AI Optimization Engine</div>
 					<div className="panelRight" style={{ gap: 12 }}>
-						<span style={{ cursor: 'pointer', fontSize: 18 }}>📷</span>
-						<span style={{ cursor: 'pointer', fontSize: 18 }}>🔔</span>
-						<span style={{ cursor: 'pointer', fontSize: 18 }}>⚙️</span>
+						<span style={{ cursor: 'pointer', fontSize: 12, padding: '4px 8px', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: 4 }}>Camera</span>
+						<span style={{ cursor: 'pointer', fontSize: 12, padding: '4px 8px', backgroundColor: 'rgba(245, 158, 11, 0.1)', borderRadius: 4 }}>Alerts</span>
+						<span style={{ cursor: 'pointer', fontSize: 12, padding: '4px 8px', backgroundColor: 'rgba(107, 114, 128, 0.1)', borderRadius: 4 }}>Settings</span>
 					</div>
 				</div>
 			</div>
@@ -339,7 +339,7 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 			{/* Decision Support Panel - Core Feature */}
 			<div className="panel spanAll" style={{ marginBottom: 16, background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(16, 185, 129, 0.08))', border: '2px solid rgba(37, 99, 235, 0.2)' }}>
 				<div className="panelHeader">
-					<div className="panelTitle" style={{ fontSize: 18, fontWeight: 700 }}>🎯 Decision Support Recommendations</div>
+					<div className="panelTitle" style={{ fontSize: 18, fontWeight: 700 }}>Decision Support Recommendations</div>
 					<div className="panelRight" style={{ fontSize: 11, color: 'var(--muted)' }}>
 						Updated {formatDateTime(dashboard.timestamp)}
 					</div>
@@ -348,10 +348,7 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 
 					{/* Optimal Labor Allocation */}
 					<div style={{ padding: 16, backgroundColor: 'rgba(255, 255, 255, 0.8)', borderRadius: 8, border: '1px solid rgba(245, 158, 11, 0.3)' }}>
-						<div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-							<span style={{ fontSize: 24 }}>👨‍🌾</span>
-							<div style={{ fontSize: 14, fontWeight: 700 }}>Optimal Labor Allocation</div>
-						</div>
+						<div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Optimal Labor Allocation</div>
 						{laborRecommendations.length > 0 ? (
 							<div style={{ fontSize: 12, lineHeight: 1.6, color: 'var(--text)' }}>
 								{laborRecommendations[0].text}
@@ -377,10 +374,7 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 
 					{/* Energy Optimization */}
 					<div style={{ padding: 16, backgroundColor: 'rgba(255, 255, 255, 0.8)', borderRadius: 8, border: '1px solid rgba(59, 130, 246, 0.3)' }}>
-						<div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-							<span style={{ fontSize: 24 }}>⚡</span>
-							<div style={{ fontSize: 14, fontWeight: 700 }}>Energy Optimization</div>
-						</div>
+						<div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Energy Optimization</div>
 						{energyRecommendations.length > 0 ? (
 							<div style={{ fontSize: 12, lineHeight: 1.6, color: 'var(--text)' }}>
 								{energyRecommendations[0].text}
@@ -398,10 +392,7 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 
 					{/* Best Harvest Timing */}
 					<div style={{ padding: 16, backgroundColor: 'rgba(255, 255, 255, 0.8)', borderRadius: 8, border: '1px solid rgba(220, 38, 38, 0.3)' }}>
-						<div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-							<span style={{ fontSize: 24 }}>🦐</span>
-							<div style={{ fontSize: 14, fontWeight: 700 }}>Best Harvest Timing</div>
-						</div>
+						<div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Best Harvest Timing</div>
 						{harvestRecommendations.length > 0 ? (
 							<div style={{ fontSize: 12, lineHeight: 1.6, color: 'var(--text)' }}>
 								{harvestRecommendations[0].text}
@@ -453,7 +444,6 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 							gap: 6
 						}}
 					>
-						<span>📊</span>
 						<span>General Overview</span>
 					</button>
 					<button
@@ -473,7 +463,6 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 							gap: 6
 						}}
 					>
-						<span>🍽️</span>
 						<span>Feeding Optimization</span>
 					</button>
 					<button
@@ -493,7 +482,6 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 							gap: 6
 						}}
 					>
-						<span>👨‍🌾</span>
 						<span>Labor Optimization</span>
 					</button>
 					<button
@@ -513,7 +501,6 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 							gap: 6
 						}}
 					>
-						<span>📈</span>
 						<span>Benchmarking</span>
 					</button>
 				</div>
@@ -524,7 +511,7 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 			{/* Feeding Optimization Section */}
 			<div className="panel spanAll" style={{ marginBottom: 16, background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(59, 130, 246, 0.08))', border: '2px solid rgba(16, 185, 129, 0.2)' }}>
 				<div className="panelHeader">
-					<div className="panelTitle" style={{ fontSize: 18, fontWeight: 700 }}>🍽️ Feeding Optimization</div>
+					<div className="panelTitle" style={{ fontSize: 18, fontWeight: 700 }}>Feeding Optimization</div>
 					<div className="panelRight" style={{ fontSize: 11, color: 'var(--muted)' }}>
 						Updated {formatDateTime(dashboard.timestamp)}
 					</div>
@@ -562,7 +549,6 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 					<div className="panelHeader">
 						<div className="panelTitle">Shrimp Feeding Behavior</div>
 						<div style={{ fontSize: 9, color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
-							<span>📷</span>
 							<span>AI Camera</span>
 						</div>
 					</div>
@@ -674,11 +660,11 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 						<div style={{ marginBottom: 6 }}>
 							<div style={{ fontSize: 9, fontWeight: 600, marginBottom: 2 }}>Optimized Feed:</div>
 							<div style={{ fontSize: 9, marginBottom: 2, display: 'flex', alignItems: 'center', gap: 4 }}>
-								<span style={{ color: '#16a34a' }}>✓</span>
+								<div style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#16a34a' }} />
 								<span>140 kg at 7:00 AM</span>
 							</div>
 							<div style={{ fontSize: 9, display: 'flex', alignItems: 'center', gap: 4 }}>
-								<span style={{ color: '#16a34a' }}>✓</span>
+								<div style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#16a34a' }} />
 								<span>90 kg at 4:00 PM</span>
 							</div>
 						</div>
@@ -718,7 +704,6 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 				<div className="panel">
 					<div className="panelHeader">
 						<div className="panelTitle">
-							<span style={{ marginRight: 6 }}>🤖</span>
 							AI Recommendations
 						</div>
 						<div style={{ fontSize: 10, color: 'var(--muted)' }}>
@@ -729,15 +714,15 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 						{/* Critical Priority Recommendations */}
 						<div style={{ marginBottom: 10 }}>
 							<div style={{ fontSize: 12, fontWeight: 700, color: '#dc2626', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
-								<span>🔴</span>
+								<div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#dc2626' }} />
 								<span>Critical</span>
 							</div>
 							<div style={{ padding: 8, backgroundColor: 'rgba(220, 38, 38, 0.05)', borderRadius: 8, border: '1px solid rgba(220, 38, 38, 0.2)' }}>
 								<div style={{ fontSize: 11, fontWeight: 600, marginBottom: 3, color: 'var(--text)' }}>
-									⚡ Feed 140 kg at 7:00 AM (High-Protein 35%+)
+									Feed 140 kg at 7:00 AM (High-Protein 35%+)
 								</div>
 								<div style={{ fontSize: 9, color: 'var(--muted)', lineHeight: 1.4 }}>
-									Peak 6-9 AM. Impact: +5-8% growth, FCR {formatNumber(fcr, { maximumFractionDigits: 2 })} → {formatNumber(fcr * 0.93, { maximumFractionDigits: 2 })}
+									Peak 6-9 AM. Impact: +5-8% growth, FCR {formatNumber(fcr, { maximumFractionDigits: 2 })} to {formatNumber(fcr * 0.93, { maximumFractionDigits: 2 })}
 								</div>
 							</div>
 						</div>
@@ -745,13 +730,13 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 						{/* High Priority Recommendations */}
 						<div style={{ marginBottom: 10 }}>
 							<div style={{ fontSize: 12, fontWeight: 700, color: '#f59e0b', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
-								<span>🟡</span>
+								<div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#f59e0b' }} />
 								<span>High Priority</span>
 							</div>
 							
 							<div style={{ padding: 8, backgroundColor: 'rgba(245, 158, 11, 0.05)', borderRadius: 8, border: '1px solid rgba(245, 158, 11, 0.2)', marginBottom: 6 }}>
 								<div style={{ fontSize: 11, fontWeight: 600, marginBottom: 3, color: 'var(--text)' }}>
-									🌅 Afternoon: 90 kg at 4:00 PM
+									Afternoon: 90 kg at 4:00 PM
 								</div>
 								<div style={{ fontSize: 9, color: 'var(--muted)', lineHeight: 1.4 }}>
 									Reduces waste ~12%, maintains growth. Temp {formatNumber(avgTemp, { maximumFractionDigits: 1 })}°C optimal.
@@ -760,7 +745,7 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 
 							<div style={{ padding: 8, backgroundColor: 'rgba(245, 158, 11, 0.05)', borderRadius: 8, border: '1px solid rgba(245, 158, 11, 0.2)' }}>
 								<div style={{ fontSize: 11, fontWeight: 600, marginBottom: 3, color: 'var(--text)' }}>
-									📉 Adaptive Reduction
+									Adaptive Reduction
 								</div>
 								<div style={{ fontSize: 9, color: 'var(--muted)', lineHeight: 1.4 }}>
 									If activity &lt;30/hr, reduce 15-20%. Save ${formatNumber((totalFeedCost * 0.15) / 100, { maximumFractionDigits: 0 })}/day
@@ -771,19 +756,19 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 						{/* Suggested Optimizations */}
 						<div>
 							<div style={{ fontSize: 12, fontWeight: 700, color: '#16a34a', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
-								<span>💡</span>
+								<div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#16a34a' }} />
 								<span>Suggested</span>
 							</div>
 							
 							<div style={{ padding: 6, backgroundColor: 'rgba(22, 163, 74, 0.05)', borderRadius: 6, border: '1px solid rgba(22, 163, 74, 0.2)', marginBottom: 5 }}>
 								<div style={{ fontSize: 10, fontWeight: 600, marginBottom: 2, color: 'var(--text)' }}>
-									🔬 Increase protein to 38-40% | Add probiotics
+									Increase protein to 38-40% | Add probiotics
 								</div>
 							</div>
 
 							<div style={{ padding: 6, backgroundColor: 'rgba(22, 163, 74, 0.05)', borderRadius: 6, border: '1px solid rgba(22, 163, 74, 0.2)' }}>
 								<div style={{ fontSize: 10, fontWeight: 600, marginBottom: 2, color: 'var(--text)' }}>
-									⏰ Shift afternoon feed to 3:00 PM (peak activity)
+									Shift afternoon feed to 3:00 PM (peak activity)
 								</div>
 							</div>
 						</div>
@@ -825,7 +810,7 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 			{/* Labor Optimization Section */}
 			<div className="panel spanAll" style={{ marginBottom: 16, background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(59, 130, 246, 0.08))', border: '2px solid rgba(245, 158, 11, 0.2)' }}>
 				<div className="panelHeader">
-					<div className="panelTitle" style={{ fontSize: 18, fontWeight: 700 }}>👨‍🌾 Labor Optimization</div>
+					<div className="panelTitle" style={{ fontSize: 18, fontWeight: 700 }}>Labor Optimization</div>
 					<div className="panelRight" style={{ fontSize: 11, color: 'var(--muted)' }}>
 						Updated {formatDateTime(dashboard.timestamp)}
 					</div>
@@ -904,12 +889,12 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 						
 						{/* AI Recommendations */}
 						<div style={{ marginTop: 16, padding: 10, backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: 8, border: '1px solid rgba(59, 130, 246, 0.2)' }}>
-							<div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6, color: 'var(--text)' }}>🤖 AI Recommendations</div>
+							<div style={{ fontSize: 12, fontWeight: 600, marginBottom: 6, color: 'var(--text)' }}>AI Recommendations</div>
 							<div style={{ fontSize: 11, color: 'var(--text)', lineHeight: 1.6, marginBottom: 4 }}>
 								• Add one more worker to the evening operation detected at Friday 6 PM
 							</div>
 							<div style={{ fontSize: 11, color: '#dc2626', lineHeight: 1.6 }}>
-								⚠️ Alert: Ryan is overloaded with back-to-back tasks
+								Alert: Ryan is overloaded with back-to-back tasks
 							</div>
 						</div>
 					</div>
@@ -989,7 +974,7 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 					</div>
 					<div style={{ padding: '12px 0' }}>
 						<div style={{ marginBottom: 16 }}>
-							<div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, color: 'var(--text)' }}>🤖 AI Recommendations</div>
+							<div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, color: 'var(--text)' }}>AI Recommendations</div>
 							<div style={{ fontSize: 11, color: 'var(--text)', lineHeight: 1.8, marginBottom: 8 }}>
 								• Assign Luis to the morning shift for pond cleaning
 							</div>
@@ -1023,7 +1008,6 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 				<div className="panel">
 					<div className="panelHeader">
 						<div className="panelTitle">
-							<span style={{ marginRight: 6 }}>🤖</span>
 							AI Labor Recommendations
 						</div>
 						<div style={{ fontSize: 10, color: 'var(--muted)' }}>
@@ -1035,12 +1019,12 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 						{urgentPonds.length > 0 ? (
 							<div style={{ marginBottom: 12 }}>
 								<div style={{ fontSize: 13, fontWeight: 700, color: '#dc2626', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-									<span>🔴</span>
+									<div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#dc2626' }} />
 									<span>Critical Priority</span>
 								</div>
 								<div style={{ padding: 10, backgroundColor: 'rgba(220, 38, 38, 0.05)', borderRadius: 8, border: '1px solid rgba(220, 38, 38, 0.2)' }}>
 									<div style={{ fontSize: 12, fontWeight: 600, marginBottom: 4, color: 'var(--text)' }}>
-										⚡ Allocate 2 workers to Pond {urgentPonds[0]} for urgent water quality monitoring
+										Allocate 2 workers to Pond {urgentPonds[0]} for urgent water quality monitoring
 									</div>
 									<div style={{ fontSize: 11, color: 'var(--muted)', lineHeight: 1.5 }}>
 										Water quality status is {water.find(w => w.pond_id === urgentPonds[0])?.status || 'poor'}. Immediate attention required.
@@ -1052,13 +1036,13 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 						{/* High Priority */}
 						<div style={{ marginBottom: 12 }}>
 							<div style={{ fontSize: 13, fontWeight: 700, color: '#f59e0b', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-								<span>🟡</span>
+								<div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#f59e0b' }} />
 								<span>High Priority</span>
 							</div>
 							
 							<div style={{ padding: 10, backgroundColor: 'rgba(245, 158, 11, 0.05)', borderRadius: 8, border: '1px solid rgba(245, 158, 11, 0.2)', marginBottom: 8 }}>
 								<div style={{ fontSize: 12, fontWeight: 600, marginBottom: 4, color: 'var(--text)' }}>
-									📅 Optimize Weekly Schedule
+									Optimize Weekly Schedule
 								</div>
 								<div style={{ fontSize: 11, color: 'var(--muted)', lineHeight: 1.5 }}>
 									Current efficiency: {formatNumber(laborEfficiencyPercent, { maximumFractionDigits: 0 })}%. Shift tasks to off-peak hours. Save Rs. {formatNumber(totalLaborCost * 0.12, { maximumFractionDigits: 0 })}/day.
@@ -1067,7 +1051,7 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 
 							<div style={{ padding: 10, backgroundColor: 'rgba(245, 158, 11, 0.05)', borderRadius: 8, border: '1px solid rgba(245, 158, 11, 0.2)' }}>
 								<div style={{ fontSize: 12, fontWeight: 600, marginBottom: 4, color: 'var(--text)' }}>
-									👥 Worker Allocation
+									Worker Allocation
 								</div>
 								<div style={{ fontSize: 11, color: 'var(--muted)', lineHeight: 1.5 }}>
 									Allocate {formatNumber(avgWorkersPerPond, { maximumFractionDigits: 1 })} workers per pond. Adjust based on water quality status.
@@ -1078,13 +1062,13 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 						{/* Suggested Optimizations */}
 						<div>
 							<div style={{ fontSize: 13, fontWeight: 700, color: '#16a34a', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-								<span>💡</span>
+								<div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#16a34a' }} />
 								<span>Suggested</span>
 							</div>
 							
 							<div style={{ padding: 8, backgroundColor: 'rgba(22, 163, 74, 0.05)', borderRadius: 8, border: '1px solid rgba(22, 163, 74, 0.2)', marginBottom: 6 }}>
 								<div style={{ fontSize: 12, fontWeight: 600, marginBottom: 2, color: 'var(--text)' }}>
-									⚙️ Task Automation
+									Task Automation
 								</div>
 								<div style={{ fontSize: 11, color: 'var(--muted)', lineHeight: 1.4 }}>
 									Automate water quality testing. Save {formatNumber(totalLaborHours * 0.4, { maximumFractionDigits: 1 })} hours/week.
@@ -1093,7 +1077,7 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 
 							<div style={{ padding: 8, backgroundColor: 'rgba(22, 163, 74, 0.05)', borderRadius: 8, border: '1px solid rgba(22, 163, 74, 0.2)' }}>
 								<div style={{ fontSize: 12, fontWeight: 600, marginBottom: 2, color: 'var(--text)' }}>
-									📊 Cross-Training
+									Cross-Training
 								</div>
 								<div style={{ fontSize: 11, color: 'var(--muted)', lineHeight: 1.4 }}>
 									Train workers on multiple tasks. Increase efficiency by 15-20%.
@@ -1225,16 +1209,14 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 					<div style={{ padding: '8px 0' }}>
 						<ul style={{ margin: 0, paddingLeft: 20, fontSize: 11, lineHeight: 1.8 }}>
 							<li style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-								Monday Wed/Fri: Net Cleaning <span>👥</span>
+								Monday Wed/Fri: Net Cleaning
 							</li>
 							<li style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-								Tuesday/Thursday: Aerator Maintenance <span>⚙️</span>
+								Tuesday/Thursday: Aerator Maintenance
 							</li>
 						</ul>
-						<div style={{ marginTop: 12, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-							{['👤', '👤', '👤', '📊', '📊'].map((icon, i) => (
-								<span key={i} style={{ fontSize: 16 }}>{icon}</span>
-							))}
+						<div style={{ marginTop: 12, fontSize: 11, color: 'var(--muted)' }}>
+							Workers: 3 | Tasks: 2
 						</div>
 					</div>
 				</div>
@@ -1269,7 +1251,6 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 								gap: 6
 							}}
 						>
-							<span>📅</span>
 							<span>Optimization Log {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
 						</button>
 					</div>
@@ -1343,11 +1324,11 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 						<div style={{ marginBottom: 12 }}>
 							<div style={{ fontSize: 11, fontWeight: 600, marginBottom: 8 }}>Weekly Task Schedule:</div>
 							<div style={{ fontSize: 11, display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-								<span>👥</span>
+								<div style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#f59e0b' }} />
 								<span>Net Cleaning & Shrimp Sampling</span>
 							</div>
 							<div style={{ fontSize: 11, display: 'flex', alignItems: 'center', gap: 6 }}>
-								<span>⚙️</span>
+								<div style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#3b82f6' }} />
 								<span>Aerator Maintenance</span>
 							</div>
 						</div>
@@ -1393,7 +1374,7 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 			{/* Benchmarking Section */}
 			<div className="panel spanAll" style={{ marginBottom: 12, background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(59, 130, 246, 0.08))', border: '2px solid rgba(139, 92, 246, 0.2)' }}>
 				<div className="panelHeader">
-					<div className="panelTitle" style={{ fontSize: 16, fontWeight: 700 }}>📈 AI KPI Benchmarking & Performance Overview</div>
+					<div className="panelTitle" style={{ fontSize: 16, fontWeight: 700 }}>AI KPI Benchmarking & Performance Overview</div>
 					<div className="panelRight" style={{ fontSize: 10, color: 'var(--muted)' }}>
 						Updated {formatDateTime(dashboard.timestamp)}
 					</div>
@@ -1448,7 +1429,7 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 													color: row.status === 'better' ? '#16a34a' : '#f59e0b',
 													border: `1px solid ${row.status === 'better' ? '#16a34a' : '#f59e0b'}`
 												}}>
-													{row.status === 'better' ? '✓ Better' : '⚠ Warning'}
+													{row.status === 'better' ? 'Better' : 'Warning'}
 												</div>
 											</td>
 										</tr>
@@ -1458,11 +1439,11 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 						</div>
 						<div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
 							<div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: 6, backgroundColor: 'rgba(34, 197, 94, 0.1)', borderRadius: 6 }}>
-								<span style={{ fontSize: 14 }}>✅</span>
+								<div style={{ width: 14, height: 14, borderRadius: '50%', backgroundColor: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, color: 'white', fontWeight: 700 }}>OK</div>
 								<span style={{ fontSize: 10, color: 'var(--text)' }}>Your farm outperforms benchmarks in 4 of 5 KPIs.</span>
 							</div>
 							<div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: 6, backgroundColor: 'rgba(245, 158, 11, 0.1)', borderRadius: 6 }}>
-								<span style={{ fontSize: 14 }}>⚠️</span>
+								<div style={{ width: 14, height: 14, borderRadius: '50%', backgroundColor: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, color: 'white', fontWeight: 700 }}>!</div>
 								<span style={{ fontSize: 10, color: 'var(--text)' }}>Energy efficiency can be improved by {formatNumber(((benchmarkEnergyPerKg - energyPerKgShrimp) / benchmarkEnergyPerKg) * 100, { maximumFractionDigits: 0 })}% to match industry standards.</span>
 							</div>
 						</div>
@@ -1536,11 +1517,11 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 						</div>
 						<div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
 							<div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: 6, backgroundColor: 'rgba(34, 197, 94, 0.1)', borderRadius: 6 }}>
-								<span style={{ fontSize: 14 }}>📈</span>
+								<div style={{ width: 14, height: 14, borderRadius: '50%', backgroundColor: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, color: 'white', fontWeight: 700 }}>+</div>
 								<span style={{ fontSize: 10, color: 'var(--text)' }}>Your farm outperforms benchmarks in 4 of 5 KPIs.</span>
 							</div>
 							<div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: 6, backgroundColor: 'rgba(245, 158, 11, 0.1)', borderRadius: 6 }}>
-								<span style={{ fontSize: 14 }}>⚠️</span>
+								<div style={{ width: 14, height: 14, borderRadius: '50%', backgroundColor: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, color: 'white', fontWeight: 700 }}>!</div>
 								<span style={{ fontSize: 10, color: 'var(--text)' }}>Energy efficiency can be improved by {formatNumber(((benchmarkEnergyPerKg - energyPerKgShrimp) / benchmarkEnergyPerKg) * 100, { maximumFractionDigits: 0 })}% to match industry standards.</span>
 							</div>
 						</div>
@@ -1556,7 +1537,7 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 						<div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
 							<div style={{ padding: 8, backgroundColor: 'rgba(34, 197, 94, 0.1)', borderRadius: 6, border: '1px solid rgba(34, 197, 94, 0.2)' }}>
 								<div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-									<span style={{ fontSize: 14 }}>📈</span>
+									<div style={{ width: 14, height: 14, borderRadius: '50%', backgroundColor: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, color: 'white', fontWeight: 700 }}>+</div>
 									<span style={{ fontSize: 10, fontWeight: 600, color: 'var(--text)' }}>Performance Status</span>
 								</div>
 								<div style={{ fontSize: 9, color: 'var(--text)', lineHeight: 1.4 }}>
@@ -1565,7 +1546,7 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 							</div>
 							<div style={{ padding: 8, backgroundColor: 'rgba(245, 158, 11, 0.1)', borderRadius: 6, border: '1px solid rgba(245, 158, 11, 0.2)' }}>
 								<div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-									<span style={{ fontSize: 14 }}>⚠️</span>
+									<div style={{ width: 14, height: 14, borderRadius: '50%', backgroundColor: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, color: 'white', fontWeight: 700 }}>!</div>
 									<span style={{ fontSize: 10, fontWeight: 600, color: 'var(--text)' }}>Energy Optimization</span>
 								</div>
 								<div style={{ fontSize: 9, color: 'var(--text)', lineHeight: 1.4 }}>
@@ -1574,7 +1555,7 @@ export function OptimizationView({ data, history, pondFilter }: Props) {
 							</div>
 							<div style={{ padding: 8, backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: 6, border: '1px solid rgba(59, 130, 246, 0.2)' }}>
 								<div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-									<span style={{ fontSize: 14 }}>ℹ️</span>
+									<div style={{ width: 14, height: 14, borderRadius: '50%', backgroundColor: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, color: 'white', fontWeight: 700 }}>i</div>
 									<span style={{ fontSize: 10, fontWeight: 600, color: 'var(--text)' }}>FCR Improvement</span>
 								</div>
 								<div style={{ fontSize: 9, color: 'var(--text)', lineHeight: 1.4 }}>

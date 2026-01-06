@@ -2,6 +2,10 @@ import { Line } from 'react-chartjs-2'
 import type { DashboardApiResponse, SavedFarmSnapshot } from '../lib/types'
 import { formatNumber, formatDateTime } from '../lib/format'
 import { WaterStatusBadge } from './StatusBadge'
+import { AIPredictionsPanel } from './AIPredictionsPanel'
+import { AutoTriggerPanel } from './AutoTriggerPanel'
+import { useAutoTrigger } from '../lib/useAutoTrigger'
+import { WaterQualitySimulator } from './WaterQualitySimulator'
 
 type Props = {
 	data: DashboardApiResponse
@@ -12,6 +16,9 @@ type Props = {
 export function WaterQualityView({ data, history, pondFilter }: Props) {
 	const { dashboard } = data
 	const water = pondFilter ? data.water_quality.filter((w) => w.pond_id === pondFilter) : data.water_quality
+
+	// Initialize auto-trigger system with water quality data
+	const autoTrigger = useAutoTrigger(water)
 
 	const historyFiltered = history.map((snap) => ({
 		...snap,
@@ -232,6 +239,37 @@ export function WaterQualityView({ data, history, pondFilter }: Props) {
 						))}
 					</div>
 				</div>
+			</div>
+
+			{/* AI Predictions Panel */}
+			<div className="panel spanAll">
+				<AIPredictionsPanel waterQuality={water} pondFilter={pondFilter} />
+			</div>
+
+			{/* What-if simulation panel driven by ML backend */}
+			<WaterQualitySimulator
+				defaultPh={avgPh}
+				defaultTemperature={avgTemp}
+				defaultDo={avgOxygen}
+				defaultSalinity={avgSalinity}
+			/>
+
+			{/* Automatic Trigger System Panel */}
+			<div className="panel spanAll">
+				<AutoTriggerPanel
+					systemEnabled={autoTrigger.systemEnabled}
+					setSystemEnabled={autoTrigger.setSystemEnabled}
+					devices={autoTrigger.devices}
+					configs={autoTrigger.configs}
+					events={autoTrigger.events}
+					manualOverrides={autoTrigger.manualOverrides}
+					esp32Connected={autoTrigger.esp32Connected}
+					lastCheck={autoTrigger.lastCheck}
+					onManualOverride={autoTrigger.setManualOverride}
+					onToggleConfig={autoTrigger.toggleConfig}
+					onStopDevice={autoTrigger.stopDevice}
+					onAcknowledgeEvent={autoTrigger.acknowledgeEvent}
+				/>
 			</div>
 		</div>
 	)

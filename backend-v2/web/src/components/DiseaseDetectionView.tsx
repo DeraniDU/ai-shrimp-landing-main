@@ -200,25 +200,25 @@ export function DiseaseDetectionView({ data, history, pondFilter }: Props) {
 				<div style={{ padding: 16 }}>
 					<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 12 }}>
 						<div style={{ padding: 16, backgroundColor: 'rgba(37, 99, 235, 0.05)', borderRadius: 8 }}>
-							<div style={{ fontWeight: 600, marginBottom: 4 }}>🔍 Regular Monitoring</div>
+							<div style={{ fontWeight: 600, marginBottom: 4 }}>Regular Monitoring</div>
 							<div className="muted" style={{ fontSize: '0.875rem' }}>
 								Monitor water quality parameters daily. Check for behavioral changes and feeding patterns.
 							</div>
 						</div>
 						<div style={{ padding: 16, backgroundColor: 'rgba(34, 197, 94, 0.05)', borderRadius: 8 }}>
-							<div style={{ fontWeight: 600, marginBottom: 4 }}>💧 Water Quality</div>
+							<div style={{ fontWeight: 600, marginBottom: 4 }}>Water Quality</div>
 							<div className="muted" style={{ fontSize: '0.875rem' }}>
 								Maintain optimal DO (&gt;5 mg/L), temperature (26-30°C), and pH (7.5-8.5) to prevent disease outbreaks.
 							</div>
 						</div>
 						<div style={{ padding: 16, backgroundColor: 'rgba(245, 158, 11, 0.05)', borderRadius: 8 }}>
-							<div style={{ fontWeight: 600, marginBottom: 4 }}>🍽️ Feed Management</div>
+							<div style={{ fontWeight: 600, marginBottom: 4 }}>Feed Management</div>
 							<div className="muted" style={{ fontSize: '0.875rem' }}>
 								Avoid overfeeding. Remove uneaten feed promptly. Use high-quality feed with proper nutrition.
 							</div>
 						</div>
 						<div style={{ padding: 16, backgroundColor: 'rgba(239, 68, 68, 0.05)', borderRadius: 8 }}>
-							<div style={{ fontWeight: 600, marginBottom: 4 }}>🚨 Early Detection</div>
+							<div style={{ fontWeight: 600, marginBottom: 4 }}>Early Detection</div>
 							<div className="muted" style={{ fontSize: '0.875rem' }}>
 								If disease is suspected, isolate affected ponds immediately and consult with aquaculture health experts.
 							</div>
