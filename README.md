@@ -1,4 +1,4 @@
-# 🦐 Smart Shrimp Pond Monitoring System
+ 🦐 Smart Shrimp Pond Monitoring System
 
 ## Prerequisites
 - Python 3.8+
